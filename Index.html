@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Твой прогноз</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Unbounded:wght@400;500&display=swap');
+:root{--bg:#050606;--ink:#f1f0eb;--mut:#888d8a;--silver:#dfe1dd;--line:#ffffff18}
+*{box-sizing:border-box}html,body{margin:0;background:#030404;color:var(--ink);font-family:Manrope,Arial,sans-serif}
+body{overflow-x:hidden}.app{max-width:480px;margin:auto;min-height:100vh;position:relative;overflow:hidden;background:#050606}
+.noise,.mist,.orb{position:absolute;pointer-events:none}.noise{inset:0;opacity:.09;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E")}
+.mist{width:440px;height:440px;border-radius:50%;background:#e8ece9;filter:blur(150px);opacity:.045;left:-130px;top:20%;animation:drift 12s ease-in-out infinite alternate}.mist.m2{left:auto;right:-170px;top:54%;opacity:.03;animation-duration:16s}
+@keyframes drift{to{transform:translate(80px,70px) scale(1.15)}}.screen{display:none;min-height:100vh;padding:28px 24px 42px;position:relative;z-index:2}.screen.on{display:flex;flex-direction:column;animation:enter .55s ease}@keyframes enter{from{opacity:0;filter:blur(8px);transform:scale(.99)}to{opacity:1;filter:none;transform:none}}
+.nav{height:38px;display:flex;align-items:center;justify-content:space-between;font-size:9px;letter-spacing:.23em;color:#8a8f8c}.back{background:none;border:0;color:#aaa;font-size:24px;cursor:pointer}
+h1,h2,h3{font-family:Unbounded,Manrope,sans-serif;font-weight:400}.hero{margin:auto 0}.micro{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:#858a87;margin-bottom:16px}.hero h1{font-size:39px;line-height:1.08;letter-spacing:-.045em;margin:0}.ghost{color:#505552}.lead{font-size:13px;line-height:1.65;color:#7e8380;margin:18px 0 30px}
+.brandGhost{position:absolute;font-family:Unbounded;font-size:94px;font-weight:500;letter-spacing:-.08em;color:#fff;opacity:.018;white-space:nowrap;left:-16px;top:38%;transform:rotate(-5deg);pointer-events:none}
+.homeChoices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:25px}.choice{height:275px;position:relative;cursor:pointer;border-top:1px solid #ffffff13;overflow:hidden}.choiceName{position:absolute;bottom:10px;font-family:Unbounded;font-size:16px}.choiceSub{font-family:Manrope;font-size:10px;color:#666;margin-top:6px}.objectZone{height:205px;display:grid;place-items:center;perspective:800px}.miniCard{width:95px;height:154px;border-radius:9px;background:linear-gradient(145deg,#1a1c1b,#080909);box-shadow:0 25px 45px #000,inset 0 0 0 1px #ffffff14;position:relative;transform:rotate(-8deg);transition:.55s}.miniCard:before{content:"";position:absolute;inset:9px;border:1px solid #ffffff12;border-radius:6px}.miniCard:after{content:"";position:absolute;width:38px;height:38px;border-radius:50%;border:1px solid #cfd2ce;left:28px;top:57px;box-shadow:0 0 18px #fff3}.choice:hover .miniCard{transform:rotate(3deg) translateY(-9px);box-shadow:0 28px 60px #000,0 0 36px #fff2}
+.numOrb{width:118px;height:118px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#404542,#141616 55%,#050606);box-shadow:0 22px 55px #000,0 0 28px #fff1;display:grid;place-items:center;font-family:Unbounded;font-size:48px;color:#d6d8d4;transition:.5s}.choice:hover .numOrb{transform:translateY(-8px) scale(1.04);box-shadow:0 28px 60px #000,0 0 45px #fff2}
+.words{margin:auto 0}.word{padding:19px 0;border-bottom:1px solid #ffffff0d;font-family:Unbounded;font-size:34px;letter-spacing:-.045em;color:#4e5350;cursor:pointer;transition:.3s}.word:hover{color:#f0efea;transform:translateX(10px);text-shadow:0 0 30px #fff4}.word small{display:block;font:9px Manrope;letter-spacing:.2em;color:#666;margin-bottom:7px}
+.pickTitle{margin-top:64px}.pickTitle h1{font-size:39px;line-height:1.08;margin:0}.deckStage{height:440px;margin:auto -24px -20px;position:relative;perspective:1100px}.surface{position:absolute;width:520px;height:180px;left:-20px;bottom:0;background:radial-gradient(ellipse at center,#ffffff0c 0,#0000 68%);transform:rotateX(72deg);filter:blur(3px)}
+.card{position:absolute;left:50%;top:100px;width:128px;height:220px;border-radius:10px;background:linear-gradient(135deg,#191b1a,#080909 68%);box-shadow:0 35px 55px #000e,inset 0 0 0 1px #ffffff18;transform-origin:50% 150%;cursor:pointer;transition:.55s cubic-bezier(.18,.8,.2,1);overflow:hidden}.card:before{content:"";position:absolute;inset:9px;border:1px solid #ffffff10;border-radius:6px}.card:after{content:"◐";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#bfc2bf;text-shadow:0 0 25px #fff6}.card i{position:absolute;inset:-60% -30%;background:linear-gradient(100deg,transparent 42%,#ffffff26 50%,transparent 58%);transform:translateX(-70%);transition:.65s}.card:hover i{transform:translateX(70%)}.card:nth-child(2){transform:translateX(-50%) rotate(-13deg) translateX(-58px)}.card:nth-child(1){transform:translateX(-50%) rotate(-25deg) translateX(-110px)}.card:nth-child(3){transform:translateX(-50%)}.card:nth-child(4){transform:translateX(-50%) rotate(13deg) translateX(58px)}.card:nth-child(5){transform:translateX(-50%) rotate(25deg) translateX(110px)}.card:hover{top:58px;filter:brightness(1.35);box-shadow:0 40px 70px #000,0 0 42px #ffffff27}
+.particles{position:absolute;inset:0;pointer-events:none}.particles b{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;box-shadow:0 0 8px #fff;opacity:.2;animation:float 5s infinite ease-in-out}.particles b:nth-child(1){left:17%;top:30%}.particles b:nth-child(2){left:77%;top:47%;animation-delay:-2s}.particles b:nth-child(3){left:60%;top:20%;animation-delay:-3s}.particles b:nth-child(4){left:32%;top:62%;animation-delay:-1s}@keyframes float{50%{transform:translateY(-22px);opacity:.65}}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:50}.flash.go{animation:flash .75s}@keyframes flash{0%,100%{opacity:0}30%{opacity:.3}}
+.reveal{text-align:center}.rider{width:232px;height:398px;margin:38px auto 24px;border-radius:8px;padding:8px;background:#bfc0bb;color:#151616;box-shadow:0 35px 85px #000,0 0 40px #fff2;animation:cardin .9s cubic-bezier(.2,.8,.2,1)}@keyframes cardin{from{opacity:0;transform:translateY(60px) rotateY(80deg) scale(.88)}to{opacity:1;transform:none}}
+.rframe{height:100%;border:2px solid #292b2a;padding:7px;display:flex;flex-direction:column;background:#c9c8c2}.rnum{font:18px Georgia}.rart{flex:1;margin:5px 0;border:1px solid #303231;background:linear-gradient(90deg,#353837 0 19%,#b9b9b2 19% 81%,#353837 81%);position:relative;overflow:hidden}.rart:before{content:"";position:absolute;width:90px;height:90px;border-radius:50%;left:50%;top:27px;transform:translateX(-50%);background:#deded8;box-shadow:0 0 28px #fff8}.rart:after{content:"II";position:absolute;left:0;right:0;top:135px;font:86px Georgia;color:#3d403f;opacity:.7}.rname{font-size:10px;letter-spacing:.12em}.reveal h2{font-size:25px;margin:9px 0}.reveal p{font-size:12px;color:#7c817e}.cta{width:100%;padding:17px;border:0;border-radius:4px;background:#e7e6e1;color:#090a0a;font-weight:600;margin-top:24px;cursor:pointer;box-shadow:0 0 0 #fff0;transition:.3s}.cta:hover{box-shadow:0 0 38px #ffffff30}
+.resultHead{margin:75px 0 50px}.resultHead h2{font-size:29px;margin:0}.beam{width:72px;height:1px;background:#eee;box-shadow:0 0 18px #fff;margin:24px 0}.section{padding:38px 0;border-top:1px solid #ffffff10;position:relative}.section .cap{font-size:9px;letter-spacing:.24em;color:#767b78;margin-bottom:15px}.section h3{font-size:21px;line-height:1.35;margin:0 0 14px}.section p{font-size:14px;color:#a5a8a4;line-height:1.78;margin:0}.section:after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;background:#fff;filter:blur(80px);opacity:.018;right:-50px;top:20px}
+
+/* v5: abstract silent background */
+.app:before,.app:after{content:"";position:absolute;pointer-events:none;z-index:0;border-radius:50%;filter:blur(90px)}
+.app:before{width:340px;height:520px;left:-180px;top:12%;background:radial-gradient(ellipse,#cfd5d21c 0,#8e96920a 42%,transparent 72%);animation:bgfloat 13s ease-in-out infinite alternate}
+.app:after{width:300px;height:420px;right:-170px;top:48%;background:radial-gradient(ellipse,#eef1ef12 0,#81878408 45%,transparent 72%);animation:bgfloat2 17s ease-in-out infinite alternate}
+@keyframes bgfloat{to{transform:translate(80px,100px) scale(1.15) rotate(8deg)}}
+@keyframes bgfloat2{to{transform:translate(-60px,-70px) scale(.9) rotate(-10deg)}}
+.brandGhost{display:none!important}
+.eventline{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:16px 0;border-top:1px solid #ffffff0c;margin-top:8px}
+.eventline b{font-family:Unbounded;font-size:10px;font-weight:400;color:#d8dad6;text-shadow:0 0 16px #fff4}
+.eventline span{font-size:13px;line-height:1.65;color:#9da19e}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:22px}.split>div+div{border-left:1px solid #ffffff10;padding-left:22px}
+.split h3{font-size:16px}.split p{font-size:12px;line-height:1.65}
+.finalbox{margin:20px -10px 0;padding:32px 18px;border:1px solid #ffffff14;border-radius:14px;background:linear-gradient(145deg,#ffffff08,#ffffff02);box-shadow:inset 0 0 50px #ffffff05,0 0 50px #0008}
+.finalbox h3{text-shadow:0 0 28px #ffffff1f}
+
+
+.realcard{padding:0;background:#0b0c0c;overflow:hidden;position:relative}
+.realcard.imageError{display:grid;place-items:center;background:#091112;border:1px solid #8b6f3d66}.realcard.imageError:before{content:"КАРТА НЕ ЗАГРУЗИЛАСЬ";font-size:10px;letter-spacing:.18em;color:#9c8a68;padding:24px}.realcard img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) contrast(1.08) brightness(.82);mix-blend-mode:screen}
+.realcard:after{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#dfe4e112,#05060635);box-shadow:inset 0 0 35px #000;pointer-events:none}
+.drawhint{font-size:10px;letter-spacing:.16em;color:#6f7471;text-align:center;margin-top:-30px}
+.sourceNote{font-size:9px;color:#555a57;line-height:1.5;margin-top:24px}
+
+
+/* ===== v8: 22-card ritual selector; preserve v6 visual language ===== */
+.pickTitle{margin-top:46px}
+.pickTitle h1{font-size:38px}
+.deckStage{height:auto;min-height:420px;margin:30px -10px 0;perspective:none;display:block;overflow:visible}
+.deckStage .surface{display:none}
+.arcanaDeck{display:block;padding:20px 0 26px;position:relative;overflow:visible}
+.fanRow{display:flex;justify-content:center;align-items:flex-end;height:165px;position:relative}
+.fanRow + .fanRow{margin-top:-24px}
+.pickCard{position:relative;flex:0 0 64px;height:112px;margin-left:-36px;border:0;border-radius:9px;cursor:pointer;overflow:hidden;background:linear-gradient(145deg,#171918 0%,#080909 72%);box-shadow:0 18px 36px #000c,inset 0 0 0 1px #ffffff14;transition:transform .28s ease,box-shadow .28s ease,filter .28s ease;isolation:isolate;transform:translateY(var(--lift,0px)) rotate(var(--rot,0deg));transform-origin:50% 100%}
+.pickCard:first-child{margin-left:0}
+.pickCard:before{content:"";position:absolute;inset:6px;border:1px solid #ffffff12;border-radius:6px;background:radial-gradient(circle at 50% 38%,#ffffff0a,transparent 38%)}
+.pickCard:after{content:"";position:absolute;inset:-45% -70%;background:linear-gradient(100deg,transparent 43%,#ffffff24 50%,transparent 57%);transform:translateX(-60%) rotate(7deg);transition:transform .65s ease;z-index:2}
+.pickCard:hover,.pickCard:focus-visible{transform:translateY(calc(var(--lift,0px) - 16px)) rotate(var(--rot,0deg)) scale(1.08);filter:brightness(1.18);box-shadow:0 25px 48px #000,0 0 34px #ffffff1f,inset 0 0 0 1px #ffffff24;outline:none;z-index:99}
+.pickCard:hover:after,.pickCard:focus-visible:after{transform:translateX(60%) rotate(7deg)}
+.pickMark{position:absolute;inset:0;display:grid;place-items:center;z-index:1}.pickMark:before{content:"";width:26px;height:26px;border:1px solid #d9ddda55;border-radius:50%;box-shadow:0 0 22px #ffffff22,inset 0 0 18px #ffffff0d}.pickMark:after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:#d9ddda99;box-shadow:0 0 15px #fff}
+.pickCard .sigil{position:absolute;width:40%;aspect-ratio:1;border:1px solid #cfd3cf2b;border-radius:50%;left:30%;top:24%;box-shadow:0 0 18px #fff1,inset 0 0 20px #ffffff08;z-index:0}
+.pickCard .sigil:before,.pickCard .sigil:after{content:"";position:absolute;left:50%;top:50%;background:#cfd3cf26;transform:translate(-50%,-50%)}
+.pickCard .sigil:before{width:1px;height:138%}.pickCard .sigil:after{width:138%;height:1px}
+.deckHint{font-size:10px;letter-spacing:.13em;color:#666c68;line-height:1.6;margin-top:10px;max-width:330px}
+.deckMeta{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:8px}
+.deckCount{font:10px Unbounded;color:#848985;white-space:nowrap}
+
+.eventline{display:block;padding:15px 0;border-top:1px solid #ffffff0c;margin-top:6px}
+.eventline b{display:none}.eventline span{display:block;font-size:13px;line-height:1.7;color:#9da19e}
+.section h3{font-size:21px;line-height:1.35}
+.section p{font-size:14px;line-height:1.82}
+.resultHead{margin-bottom:42px}
+
+@media(min-width:421px){
+  .pickCard{flex-basis:68px;height:118px;margin-left:-38px}
+  .fanRow{height:176px}
+}
+@media(max-width:370px){
+  .pickCard{flex-basis:58px;height:102px;margin-left:-34px;border-radius:7px}
+  .fanRow{height:152px}
+  .fanRow + .fanRow{margin-top:-18px}
+  .deckStage{margin-left:-2px;margin-right:-2px}
+}
+.realcard.imageError{display:grid;place-items:center;background:#091112;border:1px solid #8b6f3d66}.realcard.imageError:before{content:"КАРТА НЕ ЗАГРУЗИЛАСЬ";font-size:10px;letter-spacing:.18em;color:#9c8a68;padding:24px}.realcard img{filter:saturate(.72) contrast(1.08) brightness(.78);mix-blend-mode:normal}.realcard:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,#06101418 0%,transparent 30%,#02030328 100%);box-shadow:inset 0 0 36px #000a}.realcard{border:1px solid #d8dad61a}
+.reveal .micro{margin-top:6px}
+.homeSoloSpacer{height:14px}
+
+
+/* ===== Reference-inspired celestial tarot treatment ===== */
+.rider{width:252px;height:432px;padding:12px;margin:34px auto 24px;border-radius:18px;background:
+ radial-gradient(circle at 50% 30%,#1a2b2e 0%,#0a1517 48%,#050809 100%);
+ box-shadow:0 34px 90px #000,0 0 46px #9b7a3b18,inset 0 0 0 1px #c8a96a33;position:relative}
+.realcard{border:1px solid #9f83503d;overflow:hidden;background:#081113;border-radius:18px}
+.realcard.imageError{display:grid;place-items:center;background:#091112;border:1px solid #8b6f3d66}.realcard.imageError:before{content:"КАРТА НЕ ЗАГРУЗИЛАСЬ";font-size:10px;letter-spacing:.18em;color:#9c8a68;padding:24px}.realcard img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;border-radius:11px;
+ filter:saturate(.88) sepia(.10) contrast(1.06) brightness(.74);mix-blend-mode:normal;
+ box-shadow:inset 0 0 0 1px #c8a96a24}
+.realcard:before{content:"";position:absolute;inset:7px;z-index:3;pointer-events:none;border-radius:13px;
+ background:
+ radial-gradient(circle at 10% 9%,#c8a96a 0 1px,transparent 2px),
+ radial-gradient(circle at 90% 9%,#c8a96a 0 1px,transparent 2px),
+ radial-gradient(circle at 10% 91%,#c8a96a 0 1px,transparent 2px),
+ radial-gradient(circle at 90% 91%,#c8a96a 0 1px,transparent 2px),
+ linear-gradient(90deg,transparent 0 7%,#c8a96a66 7.4% 7.7%,transparent 8.1% 91.9%,#c8a96a66 92.3% 92.6%,transparent 93% 100%),
+ linear-gradient(0deg,transparent 0 5.5%,#c8a96a55 6% 6.25%,transparent 6.7% 93.3%,#c8a96a55 93.75% 94%,transparent 94.5% 100%);
+ box-shadow:inset 0 0 0 1px #d2b26a5c,inset 0 0 0 7px #08111355}
+.realcard:after{content:"☾   ✦   ☽";position:absolute;left:0;right:0;top:10px;z-index:4;pointer-events:none;
+ text-align:center;color:#c8a96a;font-family:Georgia,serif;font-size:13px;letter-spacing:7px;opacity:.74;
+ text-shadow:0 0 12px #c8a96a55}
+.reveal .rider::after{content:"✦  ·  ☾  ·  ✦";position:absolute;left:0;right:0;bottom:8px;z-index:4;
+ color:#b8995d;font-family:Georgia,serif;font-size:10px;letter-spacing:5px;opacity:.6;pointer-events:none}
+
+
+/* NUMEROLOGY MODULE */
+.numWrap{width:min(760px,calc(100% - 34px));margin:84px auto 46px}
+.numIntro{margin-bottom:26px}
+.numIntro h1{margin:8px 0 12px;font-size:clamp(46px,10vw,88px);line-height:.88;letter-spacing:-.05em}
+.numIntro .lead{max-width:560px}
+.numForm{border-top:1px solid #d7dad51f;border-bottom:1px solid #d7dad51f;padding:22px 0 26px;margin-top:24px}
+.numLabel{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#a7aaa6;margin-bottom:10px}
+.numDate{width:100%;box-sizing:border-box;background:#0a0c0d;border:1px solid #d7dad52a;color:#eeeae0;border-radius:14px;padding:16px 18px;font:500 16px/1.2 Arial,sans-serif;outline:none;color-scheme:dark}
+.numDate:focus{border-color:#c8a96a88;box-shadow:0 0 0 3px #c8a96a10}
+.numPeriods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 20px}
+.numPeriodBtn{appearance:none;border:1px solid #d7dad522;background:#0b0d0e;color:#d8d8d1;border-radius:14px;padding:13px 10px;font:600 11px/1 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.numPeriodBtn.active,.numPeriodBtn:hover{border-color:#c8a96a77;background:#c8a96a0d;color:#f0eadc}
+.numError{min-height:20px;margin-top:10px;color:#bca985;font-size:12px}
+.numResultHead{padding:104px 18px 34px;text-align:center}
+.numResultHead .numHeroNumber{font-family:Georgia,serif;font-size:clamp(86px,24vw,168px);line-height:.75;color:#d9c18b;text-shadow:0 0 34px #c8a96a26;margin:24px 0 18px}
+.numResultHead h2{margin:0;font-size:clamp(31px,8vw,58px);line-height:.95;letter-spacing:-.04em}
+.numResultHead p{max-width:620px;margin:14px auto 0;color:#aeb0ab;line-height:1.65}
+.numGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 18px 18px}
+.numStat{background:#0b0d0eee;border:1px solid #d7dad51e;border-radius:16px;padding:15px 13px;min-height:94px}
+.numStat .k{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#8e918d}
+.numStat .v{font-family:Georgia,serif;font-size:32px;color:#d8c28e;margin:8px 0 3px}
+.numStat .t{font-size:11px;color:#b9bbb6;line-height:1.35}
+.numBlocks{width:min(760px,calc(100% - 34px));margin:0 auto 48px}
+.numDays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:16px}
+.numDay{border:1px solid #d7dad520;border-radius:12px;padding:11px 5px;text-align:center;background:#0b0d0e}
+.numDay .d{font-size:9px;color:#8f928e;text-transform:uppercase;letter-spacing:.08em}
+.numDay .n{font-family:Georgia,serif;font-size:25px;color:#d6bd84;margin:6px 0}
+.numDay .m{font-size:8px;color:#a6a8a4;line-height:1.2}
+.numFormula{font-size:11px;color:#7f827e;margin-top:14px;line-height:1.55}
+.numAccent{color:#d9c18b}
+@media(max-width:560px){
+ .numPeriods{grid-template-columns:1fr}
+ .numGrid{grid-template-columns:1fr}
+ .numDays{grid-template-columns:repeat(4,1fr)}
+}
+
+
+/* v16 SAFE DESIGN POLISH — без затемнения контента */
+:root{
+  --gold:#c5a66a;
+  --gold-soft:#8f7950;
+  --wine:#6a343c;
+}
+
+/* сохраняем исходную яркость и читаемость */
+body{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(197,166,106,.045), transparent 32%),
+    #090b0c;
+}
+
+/* никаких blur/opacity/filter на экранах */
+.screen{
+  opacity:1 !important;
+  filter:none !important;
+  transform:none !important;
+}
+
+/* аккуратная кнопка назад */
+.back{
+  width:38px!important;
+  height:38px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(197,166,106,.26)!important;
+  background:rgba(18,20,21,.72)!important;
+  color:#e9e5da!important;
+  display:grid!important;
+  place-items:center!important;
+  transition:.18s ease!important;
+}
+.back:hover{
+  border-color:rgba(197,166,106,.48)!important;
+  background:rgba(197,166,106,.07)!important;
+}
+
+/* золотые акценты, но текст остаётся светлым */
+.micro,.cap,.nav span{
+  color:#aaa69d!important;
+}
+.ghost{
+  color:#777269!important;
+}
+.numHeroNumber{
+  color:#d1b576!important;
+  text-shadow:0 0 28px rgba(197,166,106,.12)!important;
+}
+
+/* кнопки */
+.cta{
+  border-color:rgba(197,166,106,.34)!important;
+  background:linear-gradient(180deg,rgba(197,166,106,.10),rgba(197,166,106,.035))!important;
+  color:#f0ede5!important;
+  transition:.18s ease!important;
+}
+.cta:hover{
+  border-color:rgba(197,166,106,.50)!important;
+  background:linear-gradient(180deg,rgba(197,166,106,.14),rgba(197,166,106,.05))!important;
+}
+
+/* блоки — без дополнительного затемнения */
+.section,.numStat,.numDay{
+  border-color:rgba(197,166,106,.12)!important;
+}
+.finalbox{
+  box-shadow:inset 0 0 0 1px rgba(197,166,106,.07);
+}
+
+/* тонкий винный акцент только в финальных блоках */
+.finalbox::after{
+  content:"";
+  display:block;
+  width:44px;
+  height:2px;
+  margin-top:18px;
+  background:linear-gradient(90deg,#c5a66a,#6a343c);
+  opacity:.65;
+}
+
+/* очень лёгкое появление только содержимого, без затемнения */
+@keyframes softIn{
+  from{opacity:.88;transform:translateY(3px)}
+  to{opacity:1;transform:none}
+}
+.screen.active{
+  animation:softIn .22s ease both;
+}
+
+
+/* v17 — focused single-reading layout */
+.app{
+  background:
+    radial-gradient(circle at 50% 15%, rgba(255,255,255,.055), transparent 27%),
+    radial-gradient(circle at 12% 62%, rgba(214,191,139,.045), transparent 30%),
+    #070909!important;
+}
+.mist{opacity:.065!important}
+.mist.m2{opacity:.045!important}
+
+.reveal{
+  text-align:center;
+  padding-bottom:62px!important;
+}
+.reveal .rider{
+  margin-top:28px;
+  box-shadow:
+    0 34px 88px rgba(0,0,0,.62),
+    0 0 52px rgba(230,218,183,.12)!important;
+}
+.reveal h2{
+  color:#f6f3eb!important;
+  text-shadow:0 0 24px rgba(255,255,255,.13);
+}
+.reveal #meta{
+  color:#a9aaa5!important;
+  margin-bottom:0;
+}
+.readingFlow{
+  position:relative;
+  margin:30px 0 4px;
+  padding:30px 23px 32px;
+  text-align:left;
+  border:1px solid rgba(220,203,159,.18);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.055), transparent 36%),
+    linear-gradient(145deg,rgba(255,255,255,.038),rgba(255,255,255,.012));
+  box-shadow:
+    inset 0 0 54px rgba(255,255,255,.022),
+    0 26px 62px rgba(0,0,0,.28),
+    0 0 38px rgba(209,183,118,.035);
+}
+.readingFlow::before{
+  content:"";
+  position:absolute;
+  left:23px;
+  top:0;
+  width:58px;
+  height:1px;
+  background:linear-gradient(90deg,#d4ba7f,rgba(212,186,127,0));
+  box-shadow:0 0 16px rgba(212,186,127,.28);
+}
+.readingFlow .readingLead{
+  margin:0 0 17px;
+  font-family:Unbounded,Manrope,sans-serif;
+  font-size:20px;
+  line-height:1.42;
+  letter-spacing:-.025em;
+  color:#f5f1e8;
+  text-shadow:0 0 25px rgba(255,255,255,.08);
+}
+.readingFlow p{
+  margin:0;
+  font-size:15px;
+  line-height:1.9;
+  color:#d5d4ce!important;
+}
+.readingFlow .glow{
+  color:#ead39b;
+  font-weight:500;
+  text-shadow:0 0 17px rgba(218,188,117,.18);
+}
+.readingFlow .soft{
+  color:#f0eee7;
+}
+.reveal .cta{
+  margin-top:24px;
+}
+
+
+/* v18 — selector UI */
+.choiceScreen{
+  padding-top:86px!important;
+}
+.choicePanel{
+  width:min(560px,calc(100% - 34px));
+  margin:0 auto;
+  padding:18px 16px 20px;
+  border:1px solid rgba(210,193,151,.16);
+  border-radius:22px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.012)),
+    rgba(9,11,12,.74);
+  box-shadow:0 24px 70px rgba(0,0,0,.25),inset 0 0 32px rgba(255,255,255,.015);
+}
+.choiceTag{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 14px;
+  padding:7px 11px;
+  border-radius:999px;
+  border:1px solid rgba(210,193,151,.22);
+  background:rgba(210,193,151,.055);
+  color:#d8c9a7;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.choiceTag::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#d0b679;
+  box-shadow:0 0 12px rgba(208,182,121,.45);
+}
+.choicePrompt{
+  margin:0 0 16px;
+  font-family:Manrope,Arial,sans-serif;
+  font-size:13px;
+  font-weight:500;
+  line-height:1.55;
+  color:#aaa9a3;
+}
+.choiceButtons{
+  display:grid;
+  gap:10px;
+}
+.choiceBtn{
+  appearance:none;
+  width:100%;
+  border:1px solid rgba(215,218,213,.15);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.008)),
+    #0b0d0e;
+  color:#f0ede6;
+  border-radius:15px;
+  padding:17px 18px;
+  text-align:left;
+  cursor:pointer;
+  transition:.18s ease;
+  position:relative;
+}
+.choiceBtn::after{
+  content:"›";
+  position:absolute;
+  right:17px;
+  top:50%;
+  transform:translateY(-52%);
+  color:#9d927d;
+  font-size:22px;
+  font-weight:300;
+}
+.choiceBtn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(208,182,121,.36);
+  background:
+    linear-gradient(180deg,rgba(208,182,121,.07),rgba(255,255,255,.008)),
+    #0b0d0e;
+}
+.choiceBtn .choiceMain{
+  display:block;
+  font-size:15px;
+  font-weight:650;
+  letter-spacing:-.01em;
+}
+.choiceBtn .choiceSub{
+  display:block;
+  margin-top:4px;
+  font-size:10px;
+  color:#878a86;
+  letter-spacing:.05em;
+}
+@media(max-width:560px){
+  .choicePanel{padding:16px 13px 17px}
+  .choiceBtn{padding:16px}
+}
+
+
+/* v19 — readable paragraphs inside one continuous reading */
+.readingFlow p{margin:0 0 16px!important}
+.readingFlow p:last-child{margin-bottom:0!important}
+.readingFlow .readingLead{margin-bottom:20px!important}
+.readingFlow .readingPunch{
+  color:#ead39b;
+  font-weight:600;
+  text-shadow:0 0 18px rgba(218,188,117,.16);
+}
+
+
+/* v21 — richer reading */
+.readingFlow p{
+  margin:0 0 18px!important;
+  font-size:15.5px!important;
+  line-height:1.9!important;
+}
+.readingFlow .readingLead{
+  margin-bottom:22px!important;
+}
+
+</style></head>
+<body><main class="app"><div class="noise"></div><div class="mist"></div><div class="mist m2"></div><div class="flash" id="flash"></div>
+<section id="home" class="screen on"><div class="nav"><span></span><span></span></div><div class="hero"><div class="homeSoloSpacer"></div><h1>УЗНАЙ,<br><span class="ghost">ЧТО ДАЛЬШЕ.</span></h1><p class="lead">Выбери способ. Дальше — только твой выбор и один сценарий.</p><div class="homeChoices"><div class="choice" onclick="go('period')"><div class="objectZone"><div class="miniCard"></div></div><div class="choiceName">ТАРО<div class="choiceSub">Вытянуть карту</div></div></div><div class="choice" onclick="go('num')"><div class="objectZone"><div class="numOrb">8</div></div><div class="choiceName">НУМЕРОЛОГИЯ<div class="choiceSub">Рассчитать период</div></div></div></div></div></section>
+
+<section id="period" class="screen choiceScreen">
+  <div class="nav"><button class="back" onclick="go('home')">‹</button><span>ТАРО</span></div>
+  <div class="choicePanel">
+    <div class="choiceTag">Когда?</div>
+    <p class="choicePrompt">Выбери период, на который хочешь посмотреть расклад.</p>
+    <div class="choiceButtons">
+      <button class="choiceBtn" type="button" onclick="choose('Сегодня','topic')">
+        <span class="choiceMain">Сегодня</span>
+        <span class="choiceSub">Энергия и события ближайшего дня</span>
+      </button>
+      <button class="choiceBtn" type="button" onclick="choose('7 дней','topic')">
+        <span class="choiceMain">7 дней</span>
+        <span class="choiceSub">Что будет разворачиваться в течение недели</span>
+      </button>
+      <button class="choiceBtn" type="button" onclick="choose('Месяц','topic')">
+        <span class="choiceMain">Месяц</span>
+        <span class="choiceSub">Главный сюжет и поворотные точки месяца</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="topic" class="screen choiceScreen">
+  <div class="nav"><button class="back" onclick="go('period')">‹</button><span>ТАРО</span></div>
+  <div class="choicePanel">
+    <div class="choiceTag">О чём?</div>
+    <p class="choicePrompt">Выбери, куда направить расклад.</p>
+    <div class="choiceButtons">
+      <button class="choiceBtn" type="button" onclick="setTopic('Общий фон')">
+        <span class="choiceMain">Общий фон</span>
+        <span class="choiceSub">Главная энергия и ключевой сюжет периода</span>
+      </button>
+      <button class="choiceBtn" type="button" onclick="setTopic('Отношения')">
+        <span class="choiceMain">Отношения</span>
+        <span class="choiceSub">Связи, чувства, поведение и скрытая динамика</span>
+      </button>
+      <button class="choiceBtn" type="button" onclick="setTopic('Деньги и работа')">
+        <span class="choiceMain">Деньги и работа</span>
+        <span class="choiceSub">Доход, решения, сделки и рабочие процессы</span>
+      </button>
+    </div>
+  </div>
+</section>
+<section id="pick" class="screen"><div class="particles"><b></b><b></b><b></b><b></b></div><div class="nav"><button class="back" onclick="go('topic')">‹</button><span>ТАРО</span></div><div class="pickTitle"><div class="micro">Выбор без подсказки</div><h1>ВЫБЕРИ<br>КАРТУ.</h1><div class="deckMeta"><p class="deckHint">Перед тобой закрытая колода. Не пытайся угадать карту — выбирай ту, к которой потянется рука.</p><span class="deckCount">ВЫБОР СЛУЧАЕН</span></div></div><div class="deckStage"><div class="arcanaDeck" id="arcanaDeck"></div></div></section>
+
+<section id="reveal" class="screen reveal">
+  <div class="nav"><button class="back" onclick="go('pick')">‹</button><span>КАРТА ОТКРЫТА</span></div>
+  <div class="rider realcard"><img id="cardImage" alt="Карта Таро" referrerpolicy="no-referrer" loading="eager" decoding="async"></div>
+  <div class="micro" id="arcanaNum">II</div>
+  <h2 id="arcanaName">ВЕРХОВНАЯ<br>ЖРИЦА</h2>
+  <p id="meta"></p>
+  <div id="inlineReading" class="readingFlow"></div>
+  <button class="cta" onclick="go('home')">НОВЫЙ ПРОГНОЗ</button>
+</section>
+
+<section id="result" class="screen"><div class="nav"><button class="back" onclick="go('reveal')">‹</button><span>ПРОГНОЗ</span></div><div class="resultHead"><div class="micro" id="resultMeta"></div><h2 id="resultArcanaName">ВЕРХОВНАЯ<br>ЖРИЦА</h2><div class="beam"></div></div><div id="rBlocks"></div><button class="cta" onclick="go('home')">НОВЫЙ ПРОГНОЗ</button></section>
+
+<section id="num" class="screen">
+  <div class="nav"><button class="back" onclick="go('home')">‹</button><span>НУМЕРОЛОГИЯ</span></div>
+  <div class="numWrap">
+    <div class="numIntro">
+      <div class="micro">Персональный расчёт</div>
+      <h1>ТВОЙ<br><span class="ghost">КОД.</span></h1>
+      <p class="lead">Введи дату рождения. Я соберу базовый нумерологический профиль и прогноз на выбранный период.</p>
+    </div>
+    <div class="numForm">
+      <label class="numLabel" for="numBirth">Дата рождения</label>
+      <input class="numDate" id="numBirth" type="date" min="1900-01-01">
+      <div class="numLabel" style="margin-top:18px">Период</div>
+      <div class="numPeriods">
+        <button class="numPeriodBtn active" type="button" data-numperiod="Сегодня" onclick="setNumPeriod('Сегодня',this)">Сегодня</button>
+        <button class="numPeriodBtn" type="button" data-numperiod="7 дней" onclick="setNumPeriod('7 дней',this)">7 дней</button>
+        <button class="numPeriodBtn" type="button" data-numperiod="Месяц" onclick="setNumPeriod('Месяц',this)">Месяц</button>
+      </div>
+      <button class="cta" type="button" onclick="calculateNumerology()">РАССЧИТАТЬ</button>
+      <div class="numError" id="numError"></div>
+    </div>
+  </div>
+</section>
+
+<section id="numResult" class="screen">
+  <div class="nav"><button class="back" onclick="go('num')">‹</button><span>НУМЕРОЛОГИЯ</span></div>
+  <div class="numResultHead">
+    <div class="micro" id="numResultMeta">ПЕРСОНАЛЬНЫЙ РАСЧЁТ</div>
+    <div class="numHeroNumber" id="numHeroNumber">8</div>
+    <h2 id="numHeroTitle">ЭНЕРГИЯ ПЕРИОДА</h2>
+    <p id="numHeroText"></p>
+  </div>
+  <div class="numGrid" id="numGrid"></div>
+  <div class="numBlocks" id="numBlocks"></div>
+  <button class="cta" type="button" onclick="go('num')" style="display:block;margin:0 auto 54px">НОВЫЙ РАСЧЁТ</button>
+</section>
+
+</main>
+<script>
+let S={period:'',topic:'',card:null}; let deckOrder=[];
+function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');scrollTo(0,0)}
+function choose(v,n){S.period=v;go(n)}
+function setTopic(v){S.topic=v;go('pick')}
+
+const ARCANA = [{"roman": "0", "name": "ШУТ", "en": "The Fool", "main": "Начало без готового сценария", "event": "Период может неожиданно открыть новый маршрут, знакомство или идею. То, что сначала выглядит несерьёзно, способно стать началом важной истории.", "risk": "Не путай свободу с отсутствием последствий.", "advice": "Разреши себе попробовать новое, но сохрани один ориентир."}, {"roman": "I", "name": "МАГ", "en": "The Magician", "main": "Ты можешь повлиять на происходящее", "event": "Вероятен шанс быстро сдвинуть дело: предложение, разговор, запуск или решение окажутся в твоих руках.", "risk": "Риск — переоценить контроль и наобещать лишнего.", "advice": "Выбери одну цель и действуй конкретно."}, {"roman": "II", "name": "ВЕРХОВНАЯ ЖРИЦА", "en": "The High Priestess", "main": "Не всё лежит на поверхности", "event": "Откроется информация, мотив или деталь, после которой ситуация станет понятнее. Сейчас наблюдение полезнее давления.", "risk": "Не додумывай за других и не путай тревогу с интуицией.", "advice": "Собирай факты и не торопи развязку."}, {"roman": "III", "name": "ИМПЕРАТРИЦА", "en": "The Empress", "main": "То, что питаешь, начинает расти", "event": "Может прийти заметный результат от уже начатого: внимание, деньги, отклик, развитие проекта или отношений.", "risk": "Комфорт легко превратить в пассивность, а щедрость — в лишние траты.", "advice": "Вкладывай ресурс туда, где уже есть живой отклик."}, {"roman": "IV", "name": "ИМПЕРАТОР", "en": "The Emperor", "main": "Пора определить правила", "event": "Появится необходимость занять позицию, установить границы, распределить ответственность или принять твёрдое решение.", "risk": "Излишний контроль создаст сопротивление.", "advice": "Наведи порядок и обозначь то, что для тебя не обсуждается."}, {"roman": "V", "name": "ИЕРОФАНТ", "en": "The Hierophant", "main": "Решение через систему и опыт", "event": "Важную роль могут сыграть обучение, официальный вопрос, совет специалиста, документы или человек с большим опытом.", "risk": "Не следуй правилу только потому, что «так принято».", "advice": "Используй проверенную систему, но сверяй её со своей ситуацией."}, {"roman": "VI", "name": "ВЛЮБЛЁННЫЕ", "en": "The Lovers", "main": "Главная тема — выбор", "event": "Ситуация потребует определить, чего ты действительно хочешь. Возможны сильное притяжение, союз или решение между двумя вариантами.", "risk": "Попытка оставить все двери открытыми затянет неопределённость.", "advice": "Выбирай по ценностям, а не только по эмоции момента."}, {"roman": "VII", "name": "КОЛЕСНИЦА", "en": "The Chariot", "main": "Движение начинается", "event": "События ускорятся: поездка, переговоры, активный запуск или необходимость быстро взять управление на себя.", "risk": "Спешка и желание победить любой ценой могут увести не туда.", "advice": "Определи направление и не распыляй силу."}, {"roman": "VIII", "name": "СИЛА", "en": "Strength", "main": "Мягкая сила эффективнее давления", "event": "Появится ситуация, где результат зависит от выдержки, самообладания и умения не реагировать импульсивно.", "risk": "Доказывать силу через конфликт сейчас особенно невыгодно.", "advice": "Держи позицию спокойно и последовательно."}, {"roman": "IX", "name": "ОТШЕЛЬНИК", "en": "The Hermit", "main": "Нужна дистанция для ясности", "event": "Может возникнуть желание отойти от шума, сократить контакты, разобраться самостоятельно или глубже изучить вопрос.", "risk": "Не превращай паузу в бесконечную изоляцию.", "advice": "Оставь себе время на анализ и назначь момент решения."}, {"roman": "X", "name": "КОЛЕСО ФОРТУНЫ", "en": "Wheel of Fortune", "main": "Сценарий меняется", "event": "Вероятен неожиданный поворот, совпадение, смена условий или возможность, которую сложно было запланировать заранее.", "risk": "Не пытайся удержать старый план только потому, что уже вложилась.", "advice": "Быстро оцени новую реальность и используй окно возможности."}, {"roman": "XI", "name": "СПРАВЕДЛИВОСТЬ", "en": "Justice", "main": "Всё упирается в факты", "event": "На первый план выйдут договорённости, документы, расчёты, ответственность и последствия прошлых решений.", "risk": "Эмоциональная оценка может исказить картину.", "advice": "Проверяй цифры, условия и формулировки."}, {"roman": "XII", "name": "ПОВЕШЕННЫЙ", "en": "The Hanged Man", "main": "Привычный способ не работает", "event": "Задержка или зависшая ситуация заставит посмотреть на вопрос иначе. Продавливать прежний сценарий будет бессмысленно.", "risk": "Не путай паузу с поражением, но и не зависай без срока.", "advice": "Измени угол зрения прежде, чем делать следующий ход."}, {"roman": "XIII", "name": "СМЕРТЬ", "en": "Death", "main": "Один этап заканчивается", "event": "Может окончательно закрыться формат отношений, работы, привычки или плана, который уже исчерпал себя.", "risk": "Попытка оживить то, что закончилось, заберёт ресурс.", "advice": "Закрой старое чисто и освободи место следующему этапу."}, {"roman": "XIV", "name": "УМЕРЕННОСТЬ", "en": "Temperance", "main": "Нужна настройка, а не рывок", "event": "Ситуация будет выравниваться постепенно. Возможны примирение, восстановление, поиск удобного режима или рабочий компромисс.", "risk": "Крайности нарушат хрупкий баланс.", "advice": "Делай небольшие корректировки и смотри на накопительный эффект."}, {"roman": "XV", "name": "ДЬЯВОЛ", "en": "The Devil", "main": "Сильное желание может управлять решением", "event": "Проявится тема зависимости, денег, притяжения, ревности, контроля или соблазна получить быстрый результат.", "risk": "Главный риск — сказать себе «я могу остановиться в любой момент», когда это уже не так.", "advice": "Назови цену желания и проверь, готова ли ты её платить."}, {"roman": "XVI", "name": "БАШНЯ", "en": "The Tower", "main": "То, что держалось плохо, может резко сдвинуться", "event": "Вероятны внезапная новость, конфликт, отмена, поломка плана или факт, который больше нельзя игнорировать.", "risk": "Пытаться сохранить прежнюю конструкцию любой ценой — худшая стратегия.", "advice": "Сначала стабилизируй последствия, потом решай, что действительно стоит восстанавливать."}, {"roman": "XVII", "name": "ЗВЕЗДА", "en": "The Star", "main": "Появляется ориентир", "event": "После неопределённости может прийти надежда, полезный контакт, идея или ощущение, куда двигаться дальше.", "risk": "Не подменяй реальный план красивой мечтой.", "advice": "Зафиксируй направление и сделай маленький шаг к нему."}, {"roman": "XVIII", "name": "ЛУНА", "en": "The Moon", "main": "Картина пока искажена эмоциями", "event": "Возможны тревожность, неоднозначные сигналы, тайна или ситуация, где трудно понять чужие намерения.", "risk": "Страх способен выглядеть как факт.", "advice": "Не принимай необратимых решений, пока не появятся подтверждения."}, {"roman": "XIX", "name": "СОЛНЦЕ", "en": "The Sun", "main": "Ситуация становится яснее", "event": "Вероятны хорошие новости, признание, успешный результат, встреча или момент, когда скрывать происходящее уже не нужно.", "risk": "Самоуверенность может заставить пропустить детали.", "advice": "Показывай результат и используй период открыто."}, {"roman": "XX", "name": "СУД", "en": "Judgement", "main": "Приходит момент окончательного ответа", "event": "Вернётся тема, которую нужно закрыть или решить окончательно. Возможны важная новость, возвращение человека или пересмотр прошлого решения.", "risk": "Не повторяй старый сценарий только потому, что он снова появился.", "advice": "Смотри, чему прошлое уже научило тебя, и решай из новой позиции."}, {"roman": "XXI", "name": "МИР", "en": "The World", "main": "Цикл складывается в результат", "event": "Возможны завершение проекта, получение результата, поездка, расширение или ощущение, что длинная история наконец дошла до точки.", "risk": "Не обесценивай завершение, сразу убегая к следующей цели.", "advice": "Зафиксируй результат и только потом выбирай новый цикл."}];
+function encodeSVG(svg){return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg)}
+const CARD_ART = {
+"The Fool":{titleY:344, scene:`
+<circle cx="168" cy="74" r="20" fill="#efece3" fill-opacity=".22"/>
+<path d="M34 244 L82 166 L116 198 L150 150 L192 228" fill="none" stroke="#c8ccca" stroke-opacity=".20" stroke-width="3"/>
+<path d="M40 278 q46 -18 84 -6 q26 8 56 -16" fill="none" stroke="#f2f0ea" stroke-opacity=".18" stroke-width="2"/>
+<path d="M104 168 q10 -24 22 -6 l6 22 q4 16 18 20" fill="none" stroke="#ece9e0" stroke-opacity=".55" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="112" cy="152" r="9" fill="#ece9e0" fill-opacity=".55"/>
+<path d="M117 181 l22 -6" stroke="#ece9e0" stroke-opacity=".42" stroke-width="2.2"/>
+<path d="M99 180 l-10 28" stroke="#ece9e0" stroke-opacity=".42" stroke-width="2.2"/>
+<path d="M116 178 l10 28" stroke="#ece9e0" stroke-opacity=".42" stroke-width="2.2"/>
+<path d="M124 156 q-2 -10 12 -12" fill="none" stroke="#ece9e0" stroke-opacity=".5" stroke-width="1.8"/>
+<path d="M92 198 q-14 2 -18 14 q8 0 16 -4" fill="none" stroke="#ece9e0" stroke-opacity=".42" stroke-width="2"/>
+`},
+"The Magician":{titleY:344, scene:`
+<circle cx="110" cy="88" r="24" fill="#efece3" fill-opacity=".10"/>
+<path d="M68 264 h84" stroke="#cfd3d0" stroke-opacity=".30" stroke-width="3"/>
+<path d="M86 254 q24 -18 48 0" fill="none" stroke="#cfd3d0" stroke-opacity=".18" stroke-width="2"/>
+<circle cx="110" cy="136" r="10" fill="#ece9e0" fill-opacity=".55"/>
+<path d="M110 146 l0 58" stroke="#ece9e0" stroke-opacity=".48" stroke-width="3"/>
+<path d="M110 160 l-22 36" stroke="#ece9e0" stroke-opacity=".45" stroke-width="2.5"/>
+<path d="M112 160 l26 30" stroke="#ece9e0" stroke-opacity=".45" stroke-width="2.5"/>
+<path d="M110 176 l-10 44" stroke="#ece9e0" stroke-opacity=".40" stroke-width="2.4"/>
+<path d="M110 176 l12 44" stroke="#ece9e0" stroke-opacity=".40" stroke-width="2.4"/>
+<path d="M110 116 q-4 -30 16 -42" fill="none" stroke="#ece9e0" stroke-opacity=".50" stroke-width="2.3"/>
+<path d="M110 116 q6 12 18 8" fill="none" stroke="#ece9e0" stroke-opacity=".45" stroke-width="2.3"/>
+<circle cx="82" cy="254" r="7" fill="none" stroke="#ece9e0" stroke-opacity=".35"/><circle cx="104" cy="254" r="6" fill="none" stroke="#ece9e0" stroke-opacity=".35"/><circle cx="124" cy="254" r="7" fill="none" stroke="#ece9e0" stroke-opacity=".35"/><path d="M142 248 l8 14 l-16 0z" fill="none" stroke="#ece9e0" stroke-opacity=".35"/>
+`},
+"The High Priestess":{titleY:344, scene:`
+<circle cx="110" cy="82" r="18" fill="#efece3" fill-opacity=".16"/>
+<path d="M74 124 v132" stroke="#cfd3d0" stroke-opacity=".32" stroke-width="10"/>
+<path d="M146 124 v132" stroke="#cfd3d0" stroke-opacity=".32" stroke-width="10"/>
+<circle cx="110" cy="186" r="48" fill="none" stroke="#cfd3d0" stroke-opacity=".10" stroke-width="2"/>
+<circle cx="110" cy="154" r="10" fill="#ece9e0" fill-opacity=".58"/>
+<path d="M110 166 l0 58" stroke="#ece9e0" stroke-opacity=".44" stroke-width="3"/>
+<path d="M110 182 l-22 18" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.4"/>
+<path d="M110 182 l22 18" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.4"/>
+<path d="M110 224 q-32 22 -44 14 q12 -28 28 -44 q8 -6 16 0 q8 -6 16 0 q16 16 28 44 q-12 8 -44 -14" fill="none" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2"/>
+<path d="M94 124 q16 -12 32 0" fill="none" stroke="#ece9e0" stroke-opacity=".50" stroke-width="2"/>
+<path d="M94 262 q16 -12 32 0" fill="none" stroke="#cfd3d0" stroke-opacity=".20" stroke-width="2"/>
+`},
+"The Empress":{titleY:344, scene:`
+<path d="M42 278 q32 -20 60 -4 q24 14 76 -10" fill="none" stroke="#c8ccca" stroke-opacity=".16" stroke-width="2.5"/>
+<circle cx="110" cy="144" r="10" fill="#ece9e0" fill-opacity=".58"/>
+<path d="M110 156 l0 52" stroke="#ece9e0" stroke-opacity=".44" stroke-width="3"/>
+<path d="M110 174 l-24 16" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.4"/>
+<path d="M110 174 l24 16" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.4"/>
+<path d="M110 208 l-22 30" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.4"/>
+<path d="M110 208 l22 30" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.4"/>
+<path d="M84 132 q26 -24 52 0" fill="none" stroke="#ece9e0" stroke-opacity=".48" stroke-width="2.3"/>
+<path d="M78 230 q32 -16 64 0" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+<path d="M54 250 l12 22 M72 246 l10 22 M90 244 l10 24 M128 244 l10 24 M146 246 l10 22" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+`},
+"The Emperor":{titleY:344, scene:`
+<path d="M34 250 L86 164 L112 198 L136 150 L186 250" fill="none" stroke="#c8ccca" stroke-opacity=".18" stroke-width="3"/>
+<path d="M82 236 h56 l8 20 h-72z" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2.2"/>
+<circle cx="110" cy="144" r="10" fill="#ece9e0" fill-opacity=".58"/>
+<path d="M110 156 l0 44" stroke="#ece9e0" stroke-opacity=".44" stroke-width="3"/>
+<path d="M110 172 l-24 14" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.3"/>
+<path d="M110 172 l24 14" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.3"/>
+<path d="M110 200 l-16 30" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.3"/>
+<path d="M110 200 l16 30" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.3"/>
+<path d="M96 128 l14 -10 l14 10" fill="none" stroke="#ece9e0" stroke-opacity=".42" stroke-width="2"/>
+`},
+"The Hierophant":{titleY:344, scene:`
+<path d="M110 126 h0"/>
+<circle cx="110" cy="138" r="10" fill="#ece9e0" fill-opacity=".56"/>
+<path d="M110 150 l0 62" stroke="#ece9e0" stroke-opacity=".44" stroke-width="3"/>
+<path d="M110 172 l-24 18" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.2"/>
+<path d="M110 172 l24 18" stroke="#ece9e0" stroke-opacity=".35" stroke-width="2.2"/>
+<path d="M110 210 l-14 28" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.2"/>
+<path d="M110 210 l14 28" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.2"/>
+<circle cx="82" cy="246" r="8" fill="#ece9e0" fill-opacity=".30"/><circle cx="138" cy="246" r="8" fill="#ece9e0" fill-opacity=".30"/>
+<path d="M82 254 l-8 18 M82 254 l8 18 M138 254 l-8 18 M138 254 l8 18" stroke="#ece9e0" stroke-opacity=".26" stroke-width="2"/>
+<path d="M96 118 h28 M110 106 v24" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2"/>
+`},
+"The Lovers":{titleY:344, scene:`
+<circle cx="110" cy="74" r="20" fill="#efece3" fill-opacity=".18"/>
+<path d="M110 98 q10 18 22 16" fill="none" stroke="#ece9e0" stroke-opacity=".40" stroke-width="2.4"/>
+<path d="M78 150 q-8 16 0 34" fill="none" stroke="#ece9e0" stroke-opacity=".40" stroke-width="2.2"/>
+<path d="M142 150 q8 16 0 34" fill="none" stroke="#ece9e0" stroke-opacity=".40" stroke-width="2.2"/>
+<circle cx="78" cy="142" r="9" fill="#ece9e0" fill-opacity=".52"/><circle cx="142" cy="142" r="9" fill="#ece9e0" fill-opacity=".52"/>
+<path d="M78 154 l0 54 M142 154 l0 54" stroke="#ece9e0" stroke-opacity=".42" stroke-width="3"/>
+<path d="M78 172 l-18 24 M78 172 l18 24 M142 172 l-18 24 M142 172 l18 24" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2.2"/>
+<path d="M78 208 l-10 30 M78 208 l10 30 M142 208 l-10 30 M142 208 l10 30" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.2"/>
+<path d="M92 268 q18 -10 36 0" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2"/>
+`},
+"The Chariot":{titleY:344, scene:`
+<path d="M72 210 h76 l-10 30 h-56z" fill="none" stroke="#ece9e0" stroke-opacity=".26" stroke-width="2.4"/>
+<path d="M88 210 v-28 h44 v28" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<circle cx="110" cy="160" r="9" fill="#ece9e0" fill-opacity=".54"/>
+<path d="M110 172 l0 28" stroke="#ece9e0" stroke-opacity=".40" stroke-width="3"/>
+<path d="M110 184 l-16 14 M110 184 l16 14" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2"/>
+<circle cx="84" cy="252" r="10" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/><circle cx="136" cy="252" r="10" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<path d="M74 254 q10 -10 20 0 M126 254 q10 -10 20 0" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+`},
+"Strength":{titleY:344, scene:`
+<circle cx="100" cy="144" r="9" fill="#ece9e0" fill-opacity=".52"/>
+<path d="M100 156 l0 54" stroke="#ece9e0" stroke-opacity=".42" stroke-width="3"/>
+<path d="M100 172 l-16 22 M100 172 l18 16" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.2"/>
+<path d="M100 210 l-10 28 M100 210 l12 26" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.2"/>
+<path d="M128 190 q18 -18 32 4 q-4 22 -30 18 q-18 -6 -10 -22" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2.4"/>
+<path d="M88 120 q12 -14 24 0 q12 -14 24 0" fill="none" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.2"/>
+`},
+"The Hermit":{titleY:344, scene:`
+<circle cx="128" cy="116" r="14" fill="#efece3" fill-opacity=".24"/>
+<path d="M112 138 q-18 18 -18 62 q16 34 40 0 q0 -44 -22 -62" fill="none" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.8"/>
+<circle cx="116" cy="126" r="8" fill="#ece9e0" fill-opacity=".52"/>
+<path d="M138 150 l0 92" stroke="#ece9e0" stroke-opacity=".34" stroke-width="3"/>
+<path d="M86 272 q24 -16 48 0" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2"/>
+`},
+"Wheel of Fortune":{titleY:344, scene:`
+<circle cx="110" cy="188" r="56" fill="none" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.4"/>
+<circle cx="110" cy="188" r="28" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2"/>
+<path d="M54 188 h112 M110 132 v112" stroke="#ece9e0" stroke-opacity=".20" stroke-width="1.8"/>
+<circle cx="62" cy="138" r="7" fill="#ece9e0" fill-opacity=".20"/><circle cx="158" cy="138" r="7" fill="#ece9e0" fill-opacity=".20"/><circle cx="62" cy="238" r="7" fill="#ece9e0" fill-opacity=".20"/><circle cx="158" cy="238" r="7" fill="#ece9e0" fill-opacity=".20"/>
+`},
+"Justice":{titleY:344, scene:`
+<circle cx="110" cy="142" r="10" fill="#ece9e0" fill-opacity=".54"/>
+<path d="M110 154 l0 66" stroke="#ece9e0" stroke-opacity=".44" stroke-width="3"/>
+<path d="M110 174 l-18 18 M110 174 l18 18" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.2"/>
+<path d="M110 220 l-14 28 M110 220 l14 28" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.2"/>
+<path d="M86 146 h48" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<path d="M74 170 q10 22 20 0 M126 170 q10 22 20 0" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<path d="M144 130 v60" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2.2"/>
+`},
+"The Hanged Man":{titleY:344, scene:`
+<path d="M74 122 h72" stroke="#ece9e0" stroke-opacity=".24" stroke-width="3"/>
+<path d="M110 122 v30" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+<circle cx="110" cy="174" r="10" fill="#ece9e0" fill-opacity=".56"/>
+<path d="M110 184 l0 44" stroke="#ece9e0" stroke-opacity=".42" stroke-width="3"/>
+<path d="M110 200 l-18 20 M110 200 l18 20" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.2"/>
+<path d="M110 228 l-14 22 M110 228 l14 22" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2.2"/>
+<path d="M96 250 q14 -10 28 0" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+`},
+"Death":{titleY:344, scene:`
+<path d="M62 230 q18 -26 52 -18 q24 8 44 -8" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2.2"/>
+<path d="M72 220 q20 -38 48 -20 q20 12 26 34" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2.4"/>
+<path d="M114 138 l0 86" stroke="#ece9e0" stroke-opacity=".28" stroke-width="3"/>
+<circle cx="114" cy="124" r="10" fill="none" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2"/>
+<path d="M104 124 h20 M114 114 v20" stroke="#ece9e0" stroke-opacity=".24" stroke-width="1.8"/>
+<path d="M130 152 l18 32" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+`},
+"Temperance":{titleY:344, scene:`
+<circle cx="110" cy="138" r="10" fill="#ece9e0" fill-opacity=".56"/>
+<path d="M110 150 l0 62" stroke="#ece9e0" stroke-opacity=".42" stroke-width="3"/>
+<path d="M110 170 l-20 18 M110 170 l20 18" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2.2"/>
+<path d="M110 212 l-14 28 M110 212 l14 28" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.2"/>
+<path d="M88 184 l-8 20 l18 -4 M132 184 l8 20 l-18 -4" fill="none" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2"/>
+<path d="M74 128 q8 26 20 18 M146 128 q-8 26 -20 18" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+`},
+"The Devil":{titleY:344, scene:`
+<path d="M88 128 q22 -28 44 0" fill="none" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.4"/>
+<path d="M96 126 l-8 -16 M124 126 l8 -16" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<circle cx="110" cy="144" r="10" fill="#ece9e0" fill-opacity=".54"/>
+<path d="M110 154 l0 50" stroke="#ece9e0" stroke-opacity=".40" stroke-width="3"/>
+<path d="M110 170 l-22 18 M110 170 l22 18" stroke="#ece9e0" stroke-opacity=".32" stroke-width="2.2"/>
+<circle cx="88" cy="246" r="8" fill="#ece9e0" fill-opacity=".28"/><circle cx="132" cy="246" r="8" fill="#ece9e0" fill-opacity=".28"/>
+<path d="M88 254 l-8 18 M88 254 l8 18 M132 254 l-8 18 M132 254 l8 18" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+<path d="M88 226 h44" stroke="#ece9e0" stroke-opacity=".14" stroke-width="2" stroke-dasharray="3 4"/>
+`},
+"The Tower":{titleY:344, scene:`
+<path d="M92 130 h36 v120 h-36z" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2.4"/>
+<path d="M88 130 l22 -18 l22 18" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+<path d="M116 106 l-12 34 h12 l-16 38 l36 -42 h-12 l10 -30z" fill="#ece9e0" fill-opacity=".24" stroke="#ece9e0" stroke-opacity=".18"/>
+<path d="M86 226 q-14 4 -20 18 M134 222 q16 10 24 24" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<circle cx="82" cy="250" r="7" fill="#ece9e0" fill-opacity=".20"/><circle cx="148" cy="252" r="7" fill="#ece9e0" fill-opacity=".20"/>
+`},
+"The Star":{titleY:344, scene:`
+<path d="M110 112 l10 24 l26 2 l-20 16 l6 24 l-22 -12 l-22 12 l6 -24 l-20 -16 l26 -2z" fill="none" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2.2"/>
+<circle cx="86" cy="214" r="9" fill="#ece9e0" fill-opacity=".18"/><circle cx="134" cy="214" r="9" fill="#ece9e0" fill-opacity=".18"/>
+<path d="M88 210 q18 34 0 56" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2.2"/>
+<path d="M132 210 q-18 34 0 56" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2.2"/>
+<path d="M74 284 q36 -14 72 0" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2"/>
+`},
+"The Moon":{titleY:344, scene:`
+<circle cx="110" cy="86" r="20" fill="#efece3" fill-opacity=".20"/>
+<path d="M80 132 v82 M140 132 v82" stroke="#ece9e0" stroke-opacity=".16" stroke-width="8"/>
+<path d="M110 150 q-18 40 -48 74" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+<path d="M110 150 q18 40 48 74" fill="none" stroke="#ece9e0" stroke-opacity=".20" stroke-width="2"/>
+<circle cx="76" cy="236" r="10" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/><circle cx="144" cy="236" r="10" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+<path d="M102 282 q8 -20 16 0" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+`},
+"The Sun":{titleY:344, scene:`
+<circle cx="110" cy="112" r="34" fill="none" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.4"/>
+<path d="M110 70 v-18 M110 154 v18 M68 112 h-18 M152 112 h18 M82 84 l-12 -12 M138 84 l12 -12 M82 140 l-12 12 M138 140 l12 12" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<circle cx="110" cy="220" r="10" fill="#ece9e0" fill-opacity=".54"/>
+<path d="M110 232 l0 34" stroke="#ece9e0" stroke-opacity=".38" stroke-width="3"/>
+<path d="M110 246 l18 8" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2"/>
+<path d="M90 278 q20 -14 40 0" fill="none" stroke="#ece9e0" stroke-opacity=".18" stroke-width="2"/>
+<path d="M70 252 q10 -20 24 0 M126 252 q10 -20 24 0" fill="none" stroke="#ece9e0" stroke-opacity=".16" stroke-width="2"/>
+`},
+"Judgement":{titleY:344, scene:`
+<path d="M112 94 v54" stroke="#ece9e0" stroke-opacity=".24" stroke-width="3"/>
+<path d="M112 94 q24 8 34 30" fill="none" stroke="#ece9e0" stroke-opacity=".30" stroke-width="2.2"/>
+<path d="M82 228 q14 -12 28 0 q14 -12 28 0 q14 -12 28 0" fill="none" stroke="#ece9e0" stroke-opacity=".24" stroke-width="2.2"/>
+<path d="M78 204 l32 18 l32 -18" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2.2"/>
+<path d="M94 176 q16 -12 32 0" fill="none" stroke="#ece9e0" stroke-opacity=".22" stroke-width="2"/>
+`},
+"The World":{titleY:344, scene:`
+<ellipse cx="110" cy="188" rx="56" ry="78" fill="none" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2.4"/>
+<circle cx="110" cy="188" r="9" fill="#ece9e0" fill-opacity=".54"/>
+<path d="M110 200 l0 42" stroke="#ece9e0" stroke-opacity=".40" stroke-width="3"/>
+<path d="M110 214 l-16 16 M110 214 l16 16" stroke="#ece9e0" stroke-opacity=".34" stroke-width="2"/>
+<path d="M110 242 l-12 24 M110 242 l12 24" stroke="#ece9e0" stroke-opacity=".28" stroke-width="2"/>
+<circle cx="64" cy="128" r="7" fill="#ece9e0" fill-opacity=".24"/><circle cx="156" cy="128" r="7" fill="#ece9e0" fill-opacity=".24"/><circle cx="64" cy="248" r="7" fill="#ece9e0" fill-opacity=".24"/><circle cx="156" cy="248" r="7" fill="#ece9e0" fill-opacity=".24"/>
+`}
+};
+function encodeSVG(svg){return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg)}
+const PAL={bg1:'#081014',bg2:'#10171a',gold:'#a98749',gold2:'#d1b06a',cream:'#eee4cf',red:'#7c3134',blue:'#274b5a',sage:'#6e7f69',skin:'#c9a88f',white:'#d9d8cf',black:'#111315'};
+function star(x,y,r=2,c=PAL.gold2,o=.75){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" fill-opacity="${o}"/>`}
+function crescent(x,y,r=14){return `<path d="M${x+r*.5} ${y-r} A${r} ${r} 0 1 0 ${x+r*.5} ${y+r} A${r*.72} ${r*.72} 0 1 1 ${x+r*.5} ${y-r}Z" fill="${PAL.gold2}" fill-opacity=".9"/>`}
+function person(x,y,s=1,robe=PAL.blue,skin=PAL.skin,halo=false){return `<g transform="translate(${x} ${y}) scale(${s})">
+${halo?`<circle cx="0" cy="-26" r="15" fill="none" stroke="${PAL.gold2}" stroke-opacity=".55" stroke-width="2"/>`:''}
+<circle cx="0" cy="-19" r="8" fill="${skin}"/>
+<path d="M-12 -7 Q0 -15 12 -7 L18 36 Q0 48 -18 36Z" fill="${robe}"/>
+<path d="M-8 2 L-24 24" stroke="${skin}" stroke-width="4" stroke-linecap="round"/>
+<path d="M8 2 L24 24" stroke="${skin}" stroke-width="4" stroke-linecap="round"/>
+<path d="M-6 37 L-14 66 M6 37 L14 66" stroke="${robe}" stroke-width="7" stroke-linecap="round"/>
+</g>`}
+function crown(x,y){return `<path d="M${x-14} ${y+6} L${x-10} ${y-8} L${x} ${y+1} L${x+10} ${y-8} L${x+14} ${y+6}Z" fill="${PAL.gold2}"/>`}
+function flower(x,y,s=1){return `<g transform="translate(${x} ${y}) scale(${s})"><circle r="3" fill="${PAL.gold2}"/><circle cx="0" cy="-6" r="3" fill="${PAL.cream}"/><circle cx="6" cy="0" r="3" fill="${PAL.cream}"/><circle cx="0" cy="6" r="3" fill="${PAL.cream}"/><circle cx="-6" cy="0" r="3" fill="${PAL.cream}"/></g>`}
+function lion(x,y,s=1){return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="28" ry="16" fill="#8b4a2f"/><circle cx="-26" cy="-7" r="14" fill="#b05c32"/><circle cx="-26" cy="-7" r="9" fill="#7b3b2a"/><path d="M24 0 q18 4 14 22" fill="none" stroke="#8b4a2f" stroke-width="5" stroke-linecap="round"/><path d="M-12 12 l-8 20 M4 12 l-3 22 M16 10 l6 22" stroke="#6f3828" stroke-width="5" stroke-linecap="round"/></g>`}
+function angel(x,y,s=1){return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-6 -4 Q-42 -26 -36 14 Q-18 18 -4 8" fill="${PAL.cream}" fill-opacity=".55"/><path d="M6 -4 Q42 -26 36 14 Q18 18 4 8" fill="${PAL.cream}" fill-opacity=".55"/>${person(0,0,.72,PAL.white,PAL.skin,true)}</g>`}
+function mountain(){return `<path d="M28 270 L72 188 L104 230 L142 168 L194 270Z" fill="#172228" stroke="${PAL.gold}" stroke-opacity=".22" stroke-width="1.2"/>`}
+function water(){return `<path d="M24 286 Q60 274 96 284 T188 282" fill="none" stroke="#5e7e8d" stroke-opacity=".55" stroke-width="3"/><path d="M32 298 Q74 286 112 296 T184 294" fill="none" stroke="#5e7e8d" stroke-opacity=".32" stroke-width="2"/>`}
+function scene(c){
+ switch(c.en){
+  case 'The Fool': return `${mountain()}<circle cx="168" cy="76" r="18" fill="${PAL.gold2}" fill-opacity=".28"/>${person(112,172,.78,PAL.red,PAL.skin,true)}<path d="M126 145 l26 -18" stroke="${PAL.gold2}" stroke-width="3"/><circle cx="154" cy="126" r="5" fill="${PAL.cream}"/>${flower(150,124,.7)}<path d="M78 250 q-12 -12 -22 4 q10 9 21 3" fill="${PAL.cream}" fill-opacity=".75"/>`;
+  case 'The Magician': return `<circle cx="110" cy="82" r="22" fill="${PAL.gold2}" fill-opacity=".14"/><path d="M92 104 q18 -22 36 0" fill="none" stroke="${PAL.gold2}" stroke-width="2"/>${person(110,154,.82,PAL.red,PAL.skin,true)}<path d="M110 117 q-2 -28 16 -42" fill="none" stroke="${PAL.cream}" stroke-width="3"/><rect x="58" y="236" width="104" height="14" rx="3" fill="#4d382a"/><circle cx="78" cy="230" r="8" fill="none" stroke="${PAL.gold2}"/><path d="M103 222 l8 14 l-16 0z" fill="none" stroke="${PAL.gold2}"/><rect x="126" y="222" width="12" height="12" fill="none" stroke="${PAL.gold2}"/><path d="M150 220 q-8 8 0 16" fill="none" stroke="${PAL.gold2}" stroke-width="2"/>`;
+  case 'The High Priestess': return `<rect x="56" y="112" width="22" height="142" rx="2" fill="#e8e2d1"/><rect x="142" y="112" width="22" height="142" rx="2" fill="#17191c" stroke="#d7cfba" stroke-opacity=".35"/><text x="67" y="136" text-anchor="middle" fill="#111" font-size="16" font-family="Georgia">B</text><text x="153" y="136" text-anchor="middle" fill="#ddd" font-size="16" font-family="Georgia">J</text>${person(110,160,.82,PAL.blue,PAL.skin,true)}<path d="M84 112 q26 -20 52 0" fill="none" stroke="${PAL.gold2}" stroke-width="2"/>${crescent(110,246,15)}<path d="M78 202 q32 18 64 0" fill="none" stroke="#76624a" stroke-width="2"/>`;
+  case 'The Empress': return `${crown(110,118)}${person(110,152,.84,'#6f4a45',PAL.skin,true)}<path d="M70 236 q40 -18 80 0" fill="none" stroke="${PAL.gold2}" stroke-opacity=".5" stroke-width="2"/>${flower(72,252,.8)}${flower(92,264,.7)}${flower(142,252,.8)}<path d="M42 284 l10 -30 M58 286 l8 -34 M72 286 l6 -30 M146 286 l6 -32 M162 286 l7 -28" stroke="#b99b55" stroke-opacity=".5" stroke-width="2"/>`;
+  case 'The Emperor': return `${mountain()}<rect x="78" y="140" width="64" height="96" rx="8" fill="#382a28" stroke="${PAL.gold}" stroke-opacity=".45"/>${person(110,156,.78,PAL.red,PAL.skin,false)}${crown(110,128)}<path d="M82 162 q-18 18 -22 38 M138 162 q18 18 22 38" fill="none" stroke="${PAL.gold2}" stroke-opacity=".55" stroke-width="3"/>`;
+  case 'The Hierophant': return `<rect x="74" y="122" width="72" height="116" rx="7" fill="#2c2b2b" stroke="${PAL.gold}" stroke-opacity=".35"/>${person(110,150,.76,'#6c3d42',PAL.skin,true)}<path d="M110 112 v28 M96 126 h28" stroke="${PAL.gold2}" stroke-width="2"/>${person(78,244,.46,PAL.blue,PAL.skin,false)}${person(142,244,.46,PAL.sage,PAL.skin,false)}<path d="M64 272 q46 -18 92 0" fill="none" stroke="${PAL.gold}" stroke-opacity=".26" stroke-width="2"/>`;
+  case 'The Lovers': return `${angel(110,88,.84)}${person(76,202,.66,PAL.sage,PAL.skin,false)}${person(144,202,.66,PAL.red,PAL.skin,false)}<path d="M34 284 L88 202 L110 232 L140 188 L188 284Z" fill="#172228" stroke="${PAL.gold}" stroke-opacity=".18"/>${flower(62,250,.7)}${flower(156,250,.7)}`;
+  case 'The Chariot': return `<rect x="78" y="150" width="64" height="78" rx="5" fill="#2a3038" stroke="${PAL.gold}" stroke-opacity=".4"/>${person(110,136,.68,PAL.blue,PAL.skin,true)}<path d="M90 146 l20 -18 l20 18" fill="none" stroke="${PAL.gold2}" stroke-width="2"/><ellipse cx="80" cy="252" rx="22" ry="14" fill="#d8d5cb"/><ellipse cx="140" cy="252" rx="22" ry="14" fill="#191b1f" stroke="#ccc" stroke-opacity=".25"/><circle cx="90" cy="232" r="6" fill="${PAL.gold2}"/><circle cx="130" cy="232" r="6" fill="${PAL.gold2}"/>`;
+  case 'Strength': return `${person(96,154,.78,PAL.white,PAL.skin,true)}${flower(84,128,.65)}${flower(98,126,.6)}${flower(110,132,.55)}${lion(128,226,1.15)}<path d="M104 166 q14 14 26 30" fill="none" stroke="${PAL.skin}" stroke-width="4" stroke-linecap="round"/><path d="M94 166 q4 18 20 36" fill="none" stroke="${PAL.skin}" stroke-width="4" stroke-linecap="round"/>`;
+  case 'The Hermit': return `${mountain()}<path d="M96 142 q-24 28 -18 98 q26 30 52 0 q6 -70 -18 -98z" fill="#34404a"/>${person(104,132,.64,'#34404a',PAL.skin,true)}<path d="M128 144 v98" stroke="#8e8068" stroke-width="3"/><rect x="126" y="152" width="20" height="24" rx="3" fill="#2b2520" stroke="${PAL.gold2}"/><circle cx="136" cy="164" r="6" fill="${PAL.gold2}" fill-opacity=".65"/>`;
+  case 'Wheel of Fortune': return `<circle cx="110" cy="190" r="66" fill="none" stroke="${PAL.gold2}" stroke-width="4"/><circle cx="110" cy="190" r="38" fill="none" stroke="${PAL.gold}" stroke-width="2"/><path d="M44 190 h132 M110 124 v132 M64 144 l92 92 M156 144 l-92 92" stroke="${PAL.gold}" stroke-opacity=".45" stroke-width="2"/>${star(54,118,4)}${star(166,118,4)}${star(54,262,4)}${star(166,262,4)}<text x="110" y="198" text-anchor="middle" fill="${PAL.cream}" font-size="18" font-family="Georgia">TARO</text>`;
+  case 'Justice': return `<rect x="80" y="132" width="60" height="104" rx="6" fill="#302a2a" stroke="${PAL.gold}" stroke-opacity=".35"/>${person(110,148,.72,PAL.red,PAL.skin,true)}<path d="M150 122 v118" stroke="${PAL.cream}" stroke-width="3"/><path d="M82 176 h56" stroke="${PAL.gold2}" stroke-width="2"/><path d="M78 196 q12 24 24 0 M118 196 q12 24 24 0" fill="none" stroke="${PAL.gold2}" stroke-width="2"/>`;
+  case 'The Hanged Man': return `<path d="M66 112 h88 M110 112 v30" stroke="#7a5d3e" stroke-width="6" stroke-linecap="round"/>${person(110,184,.74,PAL.blue,PAL.skin,true)}<path d="M110 212 l-18 -34 M110 212 l18 -34" stroke="${PAL.blue}" stroke-width="6"/><circle cx="110" cy="146" r="16" fill="none" stroke="${PAL.gold2}" stroke-opacity=".45" stroke-width="2"/>`;
+  case 'Death': return `<path d="M54 258 q48 -26 112 -6" fill="none" stroke="#4c6570" stroke-width="2"/> <ellipse cx="112" cy="208" rx="48" ry="26" fill="#e8e3d6" fill-opacity=".88"/><circle cx="78" cy="194" r="15" fill="#e8e3d6"/><path d="M118 178 v58" stroke="#242629" stroke-width="5"/><circle cx="118" cy="164" r="9" fill="#e8e3d6"/><path d="M127 172 l20 20 M109 172 l-18 20" stroke="#e8e3d6" stroke-width="4"/><path d="M142 150 v72" stroke="#6e5740" stroke-width="3"/><path d="M142 150 h28 v24 h-28z" fill="#111"/><path d="M147 155 l16 14 M163 155 l-16 14" stroke="#eee" stroke-width="2"/>`;
+  case 'Temperance': return `${angel(110,142,.92)}<path d="M92 208 l-10 26 l20 -4 M128 208 l10 26 l-20 -4" fill="none" stroke="${PAL.gold2}" stroke-width="2"/>${water()}<path d="M110 206 l-16 28 M110 206 l16 28" stroke="${PAL.white}" stroke-width="6" stroke-linecap="round"/>`;
+  case 'The Devil': return `<path d="M88 124 q22 -34 44 0 l10 -18 l8 20 q-10 18 -18 26" fill="#3b292a" stroke="${PAL.gold}" stroke-opacity=".35"/><circle cx="110" cy="142" r="10" fill="#8f6c5a"/> <path d="M96 154 q14 -8 28 0 l12 50 q-26 20 -52 0z" fill="#3b292a"/>${person(78,246,.48,PAL.sage,PAL.skin,false)}${person(142,246,.48,PAL.red,PAL.skin,false)}<path d="M82 218 q28 14 56 0" fill="none" stroke="${PAL.gold2}" stroke-dasharray="4 4" stroke-width="2"/>`;
+  case 'The Tower': return `<rect x="84" y="126" width="52" height="132" fill="#26333a" stroke="${PAL.gold}" stroke-opacity=".4"/><path d="M80 126 l30 -24 l30 24" fill="#26333a" stroke="${PAL.gold}" stroke-opacity=".4"/><path d="M128 82 l-18 46 h18 l-24 52 l48 -58 h-18 l14 -40z" fill="#d8b65f"/><circle cx="62" cy="234" r="7" fill="${PAL.skin}"/><circle cx="158" cy="230" r="7" fill="${PAL.skin}"/><path d="M62 242 l-14 28 M158 238 l14 28" stroke="${PAL.red}" stroke-width="5"/>`;
+  case 'The Star': return `${star(110,88,7,PAL.gold2,1)}${star(66,112,3)}${star(154,112,3)}${star(84,142,2.5)}${star(136,142,2.5)}${person(104,188,.64,PAL.cream,PAL.skin,false)}<path d="M80 208 l-12 42 M128 208 l12 42" stroke="${PAL.skin}" stroke-width="4"/>${water()}<path d="M68 250 q14 12 28 0 M124 250 q14 12 28 0" fill="none" stroke="#6d91a2" stroke-width="3"/>`;
+  case 'The Moon': return `${crescent(110,82,22)}<rect x="50" y="144" width="24" height="90" fill="#233039" stroke="${PAL.gold}" stroke-opacity=".3"/><rect x="146" y="144" width="24" height="90" fill="#233039" stroke="${PAL.gold}" stroke-opacity=".3"/><path d="M110 120 q-28 54 -62 104 M110 120 q28 54 62 104" fill="none" stroke="${PAL.gold2}" stroke-opacity=".2" stroke-width="2"/><ellipse cx="76" cy="252" rx="18" ry="12" fill="#6d5946"/><ellipse cx="144" cy="252" rx="18" ry="12" fill="#4b5660"/><path d="M104 286 q6 -18 12 0 q-6 10 -12 0z" fill="#a54d3d"/>`;
+  case 'The Sun': return `<circle cx="110" cy="90" r="34" fill="#d4a83f"/><path d="M110 42 v-18 M110 138 v18 M62 90 h-18 M158 90 h18 M76 56 l-14 -14 M144 56 l14 -14 M76 124 l-14 14 M144 124 l14 14" stroke="#d4a83f" stroke-width="3"/>${person(110,196,.62,PAL.cream,PAL.skin,false)}<ellipse cx="110" cy="246" rx="42" ry="22" fill="#d9d5ca"/><path d="M86 252 l-8 28 M132 252 l10 28" stroke="#c8c5bb" stroke-width="5"/>${flower(56,252,.8)}${flower(164,252,.8)}${flower(52,274,.7)}${flower(168,274,.7)}`;
+  case 'Judgement': return `${angel(110,96,.8)}<path d="M116 104 q24 8 34 28" fill="none" stroke="${PAL.gold2}" stroke-width="3"/><path d="M78 242 q16 -18 32 0 q16 -18 32 0 q16 -18 32 0" fill="none" stroke="${PAL.cream}" stroke-opacity=".5" stroke-width="3"/><path d="M70 272 v-28 M110 272 v-30 M150 272 v-28" stroke="#6c5a4b" stroke-width="6"/>`;
+  case 'The World': return `<ellipse cx="110" cy="188" rx="66" ry="92" fill="none" stroke="${PAL.sage}" stroke-width="7"/><ellipse cx="110" cy="188" rx="58" ry="84" fill="none" stroke="${PAL.gold2}" stroke-opacity=".45" stroke-width="2"/>${person(110,174,.72,PAL.cream,PAL.skin,true)}${star(56,112,4)}${star(164,112,4)}${star(56,264,4)}${star(164,264,4)}<circle cx="56" cy="112" r="14" fill="none" stroke="${PAL.gold}" stroke-opacity=".22"/><circle cx="164" cy="112" r="14" fill="none" stroke="${PAL.gold}" stroke-opacity=".22"/><circle cx="56" cy="264" r="14" fill="none" stroke="${PAL.gold}" stroke-opacity=".22"/><circle cx="164" cy="264" r="14" fill="none" stroke="${PAL.gold}" stroke-opacity=".22"/>`;
+ }
+ return '';
+}
+function cardSvg(c){
+ const sv=`<svg xmlns="http://www.w3.org/2000/svg" width="440" height="760" viewBox="0 0 220 380">
+ <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${PAL.bg2}"/><stop offset="1" stop-color="${PAL.bg1}"/></linearGradient><radialGradient id="v" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#ffffff" stop-opacity=".06"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient></defs>
+ <rect width="220" height="380" rx="12" fill="url(#bg)"/>
+ <rect x="8" y="8" width="204" height="364" rx="9" fill="none" stroke="${PAL.gold}" stroke-opacity=".72" stroke-width="1.2"/>
+ <rect x="16" y="16" width="188" height="348" rx="7" fill="none" stroke="${PAL.gold2}" stroke-opacity=".28"/>
+ ${crescent(42,36,8)}${star(178,36,3)}${star(160,54,2)}${star(60,54,2)}
+ <circle cx="110" cy="180" r="92" fill="url(#v)"/>
+ ${scene(c)}
+ <text x="110" y="34" fill="${PAL.cream}" font-family="Georgia" font-size="17" text-anchor="middle">${c.roman}</text>
+ <text x="110" y="346" fill="${PAL.cream}" font-family="Georgia" font-size="11" letter-spacing="1.3" text-anchor="middle">${c.name}</text>
+ </svg>`;
+ return encodeSVG(sv);
+}
+function topicSpecific(c){
+ if(S.topic==="Отношения"){
+   if(["The Lovers","The Empress","The Sun"].includes(c.en)) return "В личной сфере карта усиливает тему взаимности и открытого выбора. Смотри, кто сам выходит на связь, кто предлагает конкретику и кто готов не только говорить, но и менять поведение. Если связь живая, в этот период она станет заметно яснее.";
+   if(["The Moon","The High Priestess","The Hanged Man"].includes(c.en)) return "В отношениях ещё не всё сказано вслух. Не вытягивай признание и не устраивай проверку чувств. Пауза сейчас полезнее давления: человек быстрее покажет реальную позицию тем, что сделает сам.";
+   if(["The Tower","Death","The Devil"].includes(c.en)) return "Отношения проходят проверку на честность. Может всплыть зависимость, старая обида, ревность или формат, который держится больше на привычке, чем на близости. Не спасай то, что второй человек сам не поддерживает действиями.";
+   return "Главная тема карты проявится через отношения, границы и договорённости. Смотри не на обещания, а на поведение. Если слова и действия расходятся — ориентируйся на действия.";
+ }
+ if(S.topic==="Деньги и работа"){
+   if(["The Magician","The Chariot","The Sun","The World"].includes(c.en)) return "В работе появляется пространство для рывка. Хорошо запускать, продавать, договариваться, показывать результат и закрывать зависшие вопросы. Максимальный эффект даст не суета, а одно решение, которое напрямую влияет на деньги или итог.";
+   if(["The Tower","Death","The Devil"].includes(c.en)) return "Финансовая тема требует жёсткой проверки. Убыточная схема, токсичное обязательство или невыгодное сотрудничество могут стать слишком очевидными, чтобы их дальше оправдывать. Считай цифры и не держись за вариант только потому, что уже вложилась.";
+   if(["Justice","The Emperor","The Hierophant"].includes(c.en)) return "На первый план выйдут условия, договорённости, правила и ответственность. Всё, что было сказано устно, лучше закрепить. Деньги сейчас любят структуру: сроки, цифры, зоны ответственности и понятный следующий шаг.";
+   return "Смотри на отдачу. То, что даёт результат, усиливай. То, что забирает время и деньги без понятного выхода, пересматривай. Сейчас особенно хорошо видно, где есть эффективность, а где только ощущение занятости.";
+ }
+ return "Карта показывает общую тему периода. Не привязывай её к одному событию: смотри, какой сюжет повторяется в разговорах, решениях, людях и твоих собственных реакциях.";
+}
+function relationshipText(c){
+ if(S.topic==="Отношения") return topicSpecific(c);
+ const map={
+  "The Lovers":"Кто-то может поставить вопрос ребром: чего вы оба хотите дальше. Не соглашайся на неопределённость, если она уже давно выматывает.",
+  "The Moon":"В личной сфере возможна путаница: недосказанность, сомнения или смешанные сигналы. Не принимай тревожную фантазию за факт.",
+  "The Sun":"Отношения становятся проще и понятнее. Хороший знак — открытая инициатива, совместные планы и отсутствие необходимости угадывать, что человек чувствует.",
+  "Death":"Один формат отношений может закончиться или серьёзно измениться. Это не обязательно разрыв, но старые правила уже не работают.",
+  "The Devil":"Сильное притяжение не равно здоровой связи. Проверь, где есть зависимость, ревность, игра властью или постоянное возвращение в один и тот же конфликт."
+ };
+ return map[c.en] || "В личной сфере смотри на последовательность. Один красивый разговор ещё ничего не доказывает. Важнее повторяющиеся действия, готовность договариваться и то, становится ли рядом с человеком больше ясности, а не тревоги.";
+}
+function moneyText(c){
+ if(S.topic==="Деньги и работа") return topicSpecific(c);
+ const map={
+  "The Magician":"Может появиться шанс быстро монетизировать идею, договориться или запустить то, что давно откладывалось. Важно не растягивать подготовку.",
+  "Wheel of Fortune":"Условия могут резко измениться: новая возможность, клиент, предложение или внешнее обстоятельство. Быстрая адаптация даст больше, чем попытка удержать старый план.",
+  "Justice":"Проверяй договоры, расчёты и обещания. Всё, что связано с деньгами, лучше перевести из устных формулировок в конкретные условия.",
+  "The Tower":"То, что финансово держалось на слабом основании, может дать трещину. Сначала убери уязвимость, затем вкладывайся в рост.",
+  "The Sun":"Хороший период для публичности, продаж и демонстрации результата. Не прячь сильную работу — её нужно показывать."
+ };
+ return map[c.en] || "В деньгах и работе отделяй ощущение занятости от результата. Смотри на цифры, сроки и отдачу. Период быстро покажет, что стоит усиливать, а что съедает ресурс без нормального выхода.";
+}
+function peopleText(c){
+ if(["The High Priestess","The Moon"].includes(c.en)) return "Один человек может вести себя неоднозначно или не говорить всего напрямую. Не вытягивай из него объяснение: наблюдай, что изменится, если ты перестанешь подталкивать ситуацию.";
+ if(["The Emperor","Justice"].includes(c.en)) return "Рядом проявится человек с сильной позицией: руководитель, партнёр или тот, кто привык задавать правила. Разговор будет продуктивнее, если ты придёшь с фактами и своей ясной границей.";
+ if(["The Lovers","The Empress","The Sun"].includes(c.en)) return "Поддержка придёт через человека, который не заставляет угадывать его отношение. Обрати внимание на тех, кто сам предлагает помощь, контакт или совместный шаг.";
+ return "Кто-то рядом покажет свою позицию поступком. Не придумывай за человека удобное объяснение. Просто посмотри, что он делает: приближается, отдаляется, помогает, уходит от ответственности или берёт её на себя.";
+}
+function hiddenText(c){
+ if(["The Moon","The High Priestess","The Devil"].includes(c.en)) return "Не вся информация доступна сразу. Скрытый фактор проявится через несостыковку, чужую реакцию или деталь, которую сначала легко списать на мелочь. Не закрывай решение раньше, чем появится второй сигнал.";
+ if(["The Tower","Death"].includes(c.en)) return "Скрытая причина напряжения в том, что старый формат уже исчерпал ресурс. Проблема не в одном событии — оно лишь делает очевидным то, что давно требовало изменения.";
+ return "Причина, скорее всего, проще, чем кажется. Посмотри, какая ситуация повторяется и что обычно происходит прямо перед ней. Там и находится главный триггер.";
+}
+function opportunityText(c){
+ const strong={
+  "The Magician":"Быстро перевести идею в действие и занять инициативу до того, как ситуация снова расплывётся.",
+  "The Chariot":"Собрать силы в одно направление и получить результат за счёт темпа и дисциплины.",
+  "The Star":"Увидеть более дальний маршрут и перестать принимать временную задержку за окончательный провал.",
+  "The World":"Закрыть большой цикл, зафиксировать результат и освободить ресурс под следующий уровень."
+ };
+ return strong[c.en] || "Использовать происходящее как подсказку. Карта показывает, где можно перестать действовать по привычке и выбрать более точный вариант.";
+}
+function dontText(c){
+ if(["The Devil","The Moon"].includes(c.en)) return "Не принимай решение из страха потерять, ревности, тревоги или желания срочно вернуть контроль. Сильная эмоция сейчас легко выдаёт себя за интуицию.";
+ if(["The Tower","Death"].includes(c.en)) return "Не латать старую конструкцию только ради ощущения стабильности. Если формат очевидно закончился, временная косметика лишь отложит тот же разговор.";
+ if(["The Chariot","The Magician"].includes(c.en)) return "Не распыляйся и не пытайся доказать, что можешь всё сразу. Лишние задачи съедят главное преимущество периода — скорость и влияние.";
+ return "Не выбирай решение только потому, что оно быстро снимает напряжение. Краткое облегчение может вернуть тебя в ту же точку через несколько дней.";
+}
+
+const CARD_PERIOD={"The Fool":{"Сегодня":"Сегодня карта может проиграться через спонтанное приглашение, неожиданную поездку, новое знакомство или внезапную идею. Самое интересное будет не там, где всё заранее распланировано.","7 дней":"В течение недели может появиться новый маршрут, новый человек или предложение, которое выбьет тебя из привычного графика. Не отказывайся автоматически только потому, что это «не по плану».","Месяц":"В этом месяце вероятен новый цикл: новая компания, знакомство, проект, поездка или решение, которое сначала выглядит несерьёзно, но позже окажется важным."},"The Magician":{"Сегодня":"Сегодня всё может решиться через один контакт: звонок, сообщение, презентацию, встречу или твою инициативу.","7 дней":"На этой неделе появится возможность быстро повлиять на ситуацию самой. Особенно сильны переговоры, продажи, знакомства и любые действия, где нужно заявить о себе.","Месяц":"В этом месяце многое будет зависеть от того, насколько активно ты пользуешься своими ресурсами. Возможность появится, но без твоего первого шага она может пройти мимо."},"The High Priestess":{"Сегодня":"Сегодня может всплыть деталь, которую раньше ты не замечала: несостыковка, интонация, чужая реакция или скрытая информация.","7 дней":"В течение недели лучше наблюдать, чем форсировать. Один человек или ситуация покажут больше через молчание и действия, чем через прямой разговор.","Месяц":"В этом месяце постепенно откроется то, что сейчас скрыто. Это может быть чужой мотив, истинная причина проблемы или информация, которая изменит твой взгляд на ситуацию."},"The Empress":{"Сегодня":"Сегодня хорошо делать то, что усиливает комфорт, красоту, отношения и уже работающие проекты. Результат быстрее приходит там, где база уже есть.","7 дней":"На этой неделе может заметно вырасти то, во что ты уже вкладывалась: отношения, продукт, внешний вид, дом или творческий проект.","Месяц":"В этом месяце тема роста будет очень заметной. Что-то может стать больше: доход, внимание, клиентский поток, близость или масштаб проекта."},"The Emperor":{"Сегодня":"Сегодня может появиться разговор с руководителем, сильным мужчиной или человеком, от которого зависит решение. Лучше сразу говорить конкретно и по делу.","7 дней":"На этой неделе придётся навести порядок в одном важном вопросе: поставить границу, назначить ответственного, зафиксировать срок или принять окончательное решение.","Месяц":"В этом месяце на первый план выйдет тема контроля и структуры. Возможен сильный мужчина, руководитель, инвестор или ситуация, где именно тебе придётся взять управление на себя."},"The Hierophant":{"Сегодня":"Сегодня полезный ответ может прийти от специалиста, наставника или человека с большим опытом.","7 дней":"В течение недели вероятны официальные вопросы, обучение, документы, консультация или разговор о правилах и статусе.","Месяц":"В этом месяце может появиться необходимость действовать более официально: оформить договорённость, пройти обучение, получить консультацию или перевести отношения/проект в более понятную форму."},"The Lovers":{"Сегодня":"Сегодня может появиться момент выбора: ответить или промолчать, согласиться или отказаться, продолжить или поставить точку.","7 дней":"На этой неделе выбор станет более явным. Может быть два человека, два предложения или два сценария, между которыми уже нельзя бесконечно метаться.","Месяц":"В этом месяце одно важное решение определит дальнейший сценарий. Особенно сильно карта может проиграться через отношения, партнёрство или выбор направления."},"The Chariot":{"Сегодня":"Сегодня возможны срочные дела, дорога, встреча, быстрый разговор или ситуация, где нужно решать без долгой подготовки.","7 дней":"Неделя может пройти очень динамично: поездки, встречи, переговоры, активное продвижение дела вперёд.","Месяц":"В этом месяце темп заметно вырастет. Возможны поездка, переезд, активный запуск или быстрое развитие отношений/проекта."},"Strength":{"Сегодня":"Сегодня может возникнуть ситуация, где захочется надавить или ответить резко. Именно здесь спокойствие даст тебе больше контроля.","7 дней":"На этой неделе придётся несколько раз проявить выдержку: в отношениях, переговорах или работе с непростым человеком.","Месяц":"В этом месяце многое решится не через напор, а через устойчивость. Может появиться человек или ситуация, где сильнее окажется тот, кто умеет держать эмоции."},"The Hermit":{"Сегодня":"Сегодня полезнее сократить шум и заняться одной задачей глубоко. Хороший день для аналитики, цифр и спокойных выводов.","7 дней":"На этой неделе может понадобиться дистанция от людей или проекта, чтобы увидеть реальную причину происходящего.","Месяц":"В этом месяце ответ придёт через анализ, а не через скорость. Может понадобиться специалист, аудит, пауза или серьёзное переосмысление одного направления."},"Wheel of Fortune":{"Сегодня":"Сегодня планы могут поменяться буквально в последний момент. Одна случайность способна неожиданно вывести тебя в новый сценарий.","7 дней":"На этой неделе возможен резкий поворот: новый клиент, знакомство, отмена, перенос, неожиданное предложение или возвращение человека.","Месяц":"В этом месяце один внешний фактор может заметно изменить твою траекторию. Главное — не цепляться за старый план, если условия уже изменились."},"Justice":{"Сегодня":"Сегодня особенно важны факты, документы и формулировки. Всё, что можно проверить и зафиксировать письменно, лучше не оставлять «на словах».","7 дней":"На этой неделе может появиться договор, официальный ответ, расчёт, проверка или серьёзный разговор о правилах и обязательствах.","Месяц":"В этом месяце придётся привести один вопрос к ясности: статус отношений, договор, финансы, юридический момент или распределение ответственности."},"The Hanged Man":{"Сегодня":"Сегодня что-то может задержаться, перенестись или не дать ожидаемого ответа. Не спеши компенсировать паузу лишними действиями.","7 дней":"На этой неделе один процесс может заметно зависнуть. Это хороший момент не давить сильнее, а проверить, не пора ли менять сам подход.","Месяц":"В этом месяце ситуация может какое-то время оставаться в подвешенном состоянии. Но именно пауза поможет увидеть, что раньше ты пыталась решить неправильным способом."},"Death":{"Сегодня":"Сегодня может стать окончательно понятно, что один формат больше не работает. Решение может быть неприятным, но очень освобождающим.","7 дней":"На этой неделе вероятен финал старого сценария: прекращение общения, закрытие проекта, отказ от привычной схемы.","Месяц":"В этом месяце один большой этап действительно может завершиться. Чем быстрее ты признаешь финал, тем быстрее появится место для нового."},"Temperance":{"Сегодня":"Сегодня полезно выравнивать, а не ускорять: договариваться, чинить процессы, снижать напряжение.","7 дней":"На этой неделе ситуация будет постепенно стабилизироваться. Хорошо соединять два подхода и искать рабочий баланс.","Месяц":"В этом месяце заметный результат даст не резкий рывок, а спокойная настройка процессов, отношений и нагрузки."},"The Devil":{"Сегодня":"Сегодня может появиться очень сильный соблазн: человек, деньги, выгодное предложение или желание быстро вернуть контроль.","7 дней":"На этой неделе особенно внимательно смотри на зависимости: от человека, клиента, денег, статуса или эмоций.","Месяц":"В этом месяце может появиться очень притягательный, но неоднозначный сценарий. Важно заранее понять цену: что ты получаешь и чем за это платишь."},"The Tower":{"Сегодня":"Сегодня может внезапно всплыть проблема, которую долго удавалось обходить: конфликт, ошибка, отказ, сбой или резкая новость.","7 дней":"На этой неделе слабое место системы может проявиться очень явно. Лучше быстро локализовать проблему, чем делать вид, что всё под контролем.","Месяц":"В этом месяце возможна серьёзная перестройка: сорванный проект, смена договорённостей, конфликт или разрушение старого формата. Но именно это покажет, что давно требовало ремонта."},"The Star":{"Сегодня":"Сегодня может появиться идея, человек или сообщение, которое даст ощущение направления и вдохновения.","7 дней":"На этой неделе полезны соцсети, публичность, новые знакомства, визуальные идеи и работа на перспективу.","Месяц":"В этом месяце может появиться новый ориентир: проект, человек, мечта или направление, в которое захочется вкладываться надолго."},"The Moon":{"Сегодня":"Сегодня легко ошибиться в интерпретации чужих слов или своих ощущений. Не спеши принимать тревогу за факт.","7 дней":"На этой неделе могут быть смешанные сигналы, путаница, недоговорённости или скрытая информация.","Месяц":"В этом месяце один вопрос может долго оставаться туманным. Истина станет понятнее только после нескольких подтверждений, поэтому не торопись делать окончательный вывод."},"The Sun":{"Сегодня":"Сегодня возможна хорошая новость, удачная встреча, признание, комплимент или заметный результат.","7 дней":"На этой неделе хорошо показывать себя, результаты и продукт. Видимость напрямую влияет на результат.","Месяц":"В этом месяце ситуация может стать заметно яснее и легче. Возможны публичный успех, рост внимания, удачная поездка или важное позитивное событие."},"Judgement":{"Сегодня":"Сегодня может напомнить о себе старая тема: человек, письмо, долгий вопрос или решение, которое ты откладывала.","7 дней":"На этой неделе прошлое может вернуться в очень конкретной форме: сообщение, звонок, старый клиент, бывший партнёр или незакрытый проект.","Месяц":"В этом месяце придётся вернуться к одному старому сюжету и решить его иначе. Повторение покажет, чему ты уже научилась."},"The World":{"Сегодня":"Сегодня может завершиться важный этап: задача, переговоры, проект или личный вопрос.","7 дней":"На этой неделе вероятны завершение, поездка, международная тема, подведение итогов или переход к следующему уровню.","Месяц":"В этом месяце может закончиться большой цикл и открыться следующий: новый рынок, переезд, масштабирование, серьёзный итог в отношениях или работе."}};
+function periodSignal(c){
+ const p=(CARD_PERIOD[c.en]||{})[S.period];
+ return p || "";
+}
+const CARD_DETAIL={"The Fool":{"love":["Может появиться человек внезапно: в дороге, на вечеринке, через друзей или случайную переписку. Он может быть моложе по возрасту или просто очень лёгким, свободным, без привычки сразу определять статус отношений.","Связь начнётся быстро, но первое время будет непонятно, насколько человек готов к серьёзности. Если он предлагает встречу спонтанно и меняет планы на ходу — это очень в духе карты.","Лучше не строить далеко идущих выводов по первым эмоциям. Проверь, остаётся ли интерес после первых двух–трёх контактов."],"money":["Может появиться новый проект, новая ниша или предложение, которого раньше не было в плане. Оно может выглядеть сыроватым, но именно в этом и будет потенциал.","Подходят тесты: новый оффер, новая реклама, пробный запуск, небольшой бюджет, первая продажа. Не подходит большой риск без проверки.","Если давно думаешь о новом направлении, сейчас лучше запустить маленькую версию, чем ещё месяц готовиться."],"general":["Может сорваться привычный план и появиться что-то неожиданное: поездка, новая компания, знакомство, предложение или идея.","Главный сюжет — выйти из привычного маршрута. Самое важное событие периода может случиться именно там, куда ты изначально не собиралась.","Не пытайся сразу всё объяснить и контролировать. Сначала проживи новый опыт, потом решай, нужен ли он тебе дальше."]},"The Magician":{"love":["Может проявиться человек очень уверенный в общении: быстро пишет, умеет нравиться, делает комплименты, активно предлагает встречу. Часто это человек из продаж, бизнеса, медиа, маркетинга или просто очень коммуникабельный.","Он может производить сильное первое впечатление, поэтому важный маркер — делает ли он то, что обещал в первые дни.","Если отношения уже есть, хороший момент говорить прямо: не намёками, а конкретно — что хочешь изменить и чего ждёшь от партнёра."],"money":["Карта отлично проигрывается через продажи, презентацию, запуск рекламы, переговоры, личный бренд и новые предложения клиентам.","Если проект стоит, проблема может быть не в продукте, а в том, что его плохо показывают, объясняют или продают.","Самое полезное действие — сделать одно сильное предложение рынку: новый оффер, письмо, презентацию, звонок, пост или встречу."],"general":["Ситуация сдвинется через твою инициативу. Один разговор, сообщение или решение может дать больше эффекта, чем неделя ожидания.","Кто-то может предложить тебе возможность, но карта всё равно требует твоего активного участия — сама она не реализуется.","Сейчас важно не собирать ещё информацию, а использовать то, что уже есть."]},"The High Priestess":{"love":["Может быть человек, который чувствует больше, чем показывает. Он может наблюдать, отвечать с паузами, не говорить прямо или скрывать часть личной жизни.","Возможна тайная симпатия, закрытая переписка, треугольник или просто ситуация, где ты пока не знаешь всей правды.","Не вытягивай признание силой. Смотри, что всплывёт само: второе сообщение, несостыковка, неожиданная реакция, случайная информация."],"money":["Сейчас полезнее не продавать громче, а глубже копнуть в цифры. Проверь аналитику, воронку, стоимость лида, удержание, реальные причины отказов.","Может появиться скрытая информация о проекте, сотруднике, клиенте или партнёре. Не принимай решение, пока не проверишь её.","Хорошо заниматься исследованиями, таблицами, аналитикой и подготовкой стратегии — особенно тем, что обычно остаётся «за кадром»."],"general":["Главным событием может стать не внешняя перемена, а новая информация. Ты заметишь деталь, которая изменит отношение к ситуации.","Сейчас лучше наблюдать, чем давить. Чем меньше ты подталкиваешь людей, тем честнее они показывают себя.","Особенно обращай внимание на то, что не совпадает: слова с действиями, цифры с ощущением, обещания со сроками."]},"The Empress":{"love":["Может появиться тёплый, щедрый, внимательный человек, который проявляет заботу через действия: подарки, помощь, комфорт, приглашения.","Если отношения уже есть, тема может перейти к дому, совместному быту, семье, беременности или желанию сделать связь более устойчивой и «земной».","Сейчас важно не только получать внимание, но и смотреть, насколько оно стабильно, а не одноразово красиво."],"money":["Лучше всего идут проекты, где важны красота, визуал, упаковка, еда, бьюти, сервис, женская аудитория, комфорт и продукт.","Если продажи слабые, возможно, продукт нужно не переделывать полностью, а сделать привлекательнее и понятнее: визуал, подача, упаковка, клиентский опыт.","Хороший момент вкладываться в то, что уже растёт, а не начинать всё заново."],"general":["Что-то, во что ты уже вкладывала силы, может дать заметный рост. Это может быть проект, отношения, внешний вид, дом или творческая идея.","Период про увеличение: больше внимания, больше ресурсов, больше результата там, где уже есть база.","Не распыляй заботу на всё подряд. Выбери то, что действительно имеет потенциал."]},"The Emperor":{"love":["Может появиться мужчина старше, статуснее или просто очень собранный: руководитель, предприниматель, человек при должности, человек с сильным чувством контроля.","Внешне он скорее сдержанный, аккуратный, классический; не тот тип, который сразу открывает чувства. Он чаще показывает интерес через действия, решения, организацию встречи.","Если такой человек уже есть рядом, встанет вопрос статуса, правил, границ или того, кто за что отвечает в отношениях."],"money":["Здесь нужно не творчество, а управление. Проверь KPI, сроки, ответственных, цифры, команду и где именно разваливается дисциплина.","Может появиться сильный руководитель, инвестор или заказчик, который потребует конкретный результат без лишней лирики.","Если проект буксует — назначь ответственного, срок и одну метрику успеха. Карта любит жёсткую структуру."],"general":["Придётся принять взрослое решение и перестать оставлять важное в подвешенном состоянии.","Может появиться человек, который задаёт правила, или наоборот — именно тебе придётся их установить.","Сейчас выигрывает не тот, кто гибче всех, а тот, кто ясно понимает границы, обязанности и следующий шаг."]},"Justice":{"love":["Отношения могут перейти к серьёзному разговору о статусе, честности, разделении обязанностей, браке, разводе или официальных вопросах.","Может проявиться рациональный, принципиальный человек, связанный с правом, финансами, документами, бухгалтерией или просто очень логичный по характеру.","Здесь не работают красивые обещания. Работает только то, что можно проверить: договорённость, поступок, решение."],"money":["Проверь договоры, оплату, документы, налоги, проценты, комиссии и реальную рентабельность. Ошибка может быть не в продукте, а в условиях.","Хороший момент пересмотреть контракт, юридическую схему, расчёт прибыли или финансовую модель.","Если проект проседает, сначала открой цифры и договорённости, а уже потом ищи виноватых."],"general":["Может прийти официальный ответ, документ, решение или необходимость выбрать по фактам, а не по эмоциям.","Ситуация станет чёрно-белее: кто прав, что обещано, что выполнено, какие реальные условия.","Сейчас полезно всё фиксировать письменно."]},"The Hierophant":{"love":["Может встать вопрос официальности: знакомство с семьёй, совместная жизнь, брак, обсуждение будущего.","Возможен человек традиционных взглядов, старше по возрасту или связанный с обучением, медициной, государственными структурами.","Если отношения уже есть, важно понять: у вас одинаковые базовые ценности или только сильные чувства."],"money":["Полезно обратиться к наставнику, консультанту или специалисту, который уже проходил похожую задачу.","Хорошо работают регламенты, обучение команды, стандартные процессы, сертификация и проверенные схемы.","Если всё строится на импровизации, пора оформить нормальную систему."],"general":["Может появиться человек, который даст полезный совет или покажет более проверенный путь.","Также возможны обучение, оформление документов, официальная встреча или необходимость действовать по правилам.","Не всё нужно изобретать самой — иногда готовая система экономит месяцы."]},"The Lovers":{"love":["Сильное взаимное притяжение возможно буквально. Может быть яркое знакомство, признание или ситуация выбора между двумя людьми.","Если отношения уже есть, придётся определиться: вы идёте дальше вместе или продолжаете жить в неопределённости.","Карта часто показывает момент, когда чувства уже очевидны, а решение всё ещё откладывается."],"money":["В работе может быть выбор между двумя проектами, партнёрами, клиентами или направлениями.","Сильны коллаборации, совместные продукты, партнёрские продажи. Но попытка тянуть два несовместимых варианта сразу даст просадку.","Главный вопрос: что реально соответствует твоей цели, а не просто выглядит привлекательнее."],"general":["Период ставит тебя перед выбором. Он может быть про отношения, деньги, переезд или приоритеты.","Решение окажется важнее самого события, потому что дальше один сценарий закроется, а другой начнёт развиваться.","Не выбирай только из страха кого-то потерять."]},"The Chariot":{"love":["Может быть быстрое сближение, встреча после паузы, поездка вдвоём или отношения на расстоянии.","Возможен человек, который много ездит, работает в движении, связан с транспортом, логистикой, спортом или просто живёт очень быстро.","Если всё развивается стремительно, не забывай проверять, есть ли за скоростью реальная готовность к отношениям."],"money":["Хорошо запускать продажи, ехать на встречу, выходить на новый рынок, брать сложного клиента или быстро закрывать сделку.","Здесь выигрывает темп. Если проект завис из-за бесконечных согласований, сократи путь и назначь человека, который принимает финальное решение.","Не распыляйся: одна цель, один маршрут, один критерий результата."],"general":["События ускорятся. Возможна поездка, переезд, срочная встреча или необходимость быстро принять решение.","Период будет плотным и насыщенным, но даст результат, если не менять направление каждые два дня.","Главное — удержать курс."]},"Strength":{"love":["Может появиться физически привлекательный, уверенный человек с сильной энергетикой, но без излишней суеты. Он скорее действует спокойно, чем демонстративно.","В отношениях усилится страсть. Если есть конфликт, его лучше разруливать мягко: прямое давление быстро превратит притяжение в борьбу.","Карта хорошо показывает сильную химию, но проверяет, умеете ли вы обращаться с ней без игр во власть."],"money":["Подходит работа с людьми: переговоры, удержание клиента, сложная команда, конфликт, цена, продажи, где нужно не продавить, а дожать спокойно.","Если клиент сопротивляется, не снижай цену сразу. Сначала выясни настоящий мотив.","Хороший момент для задач, где важны выдержка и влияние, а не скорость."],"general":["Может возникнуть ситуация, которая провоцирует на жёсткую реакцию. Именно здесь и будет проверка.","Если удержишь эмоции и не пойдёшь в конфликт первым импульсом, получишь больше контроля над ситуацией.","Спокойная сила сейчас эффективнее демонстративной."]},"The Hermit":{"love":["Может быть дистанция, пауза или человек, который отвечает редко и много думает. Иногда карта показывает мужчину старше, интеллектуального, закрытого, сдержанного.","Новое знакомство вероятнее через работу, обучение, профессиональное сообщество или спокойную среду, а не через шумную тусовку.","Если человек уходит в себя, не преследуй его сообщениями. Смотри, вернётся ли он сам."],"money":["Лучшее применение карты — аналитика, аудит, стратегия, глубокая работа с цифрами и причинами.","Если продажи упали, не запускай сразу новый креатив. Сначала разложи воронку: где именно теряются люди, деньги или время.","Может быть полезен узкий эксперт, который найдёт проблему быстрее команды."],"general":["Период может быть тише обычного, но это не пустота. Это время, когда ответ приходит через анализ, а не события.","Хорошо сократить шум, встречи и лишние контакты хотя бы на день-два.","Один точный вывод сейчас ценнее десятка новых идей."]},"Wheel of Fortune":{"love":["Возможен неожиданный поворот: случайная встреча, возвращение человека, знакомство в поездке или резкое изменение статуса.","Событие может произойти буквально случайно — через отменившийся план, новую компанию, перенос встречи.","Не пытайся контролировать сценарий. Здесь важно быстро понять, что изменилось, и не упустить шанс."],"money":["Могут внезапно поменяться условия: новый клиент, срочный заказ, курс, цена, рынок, партнёр или канал продаж.","Хорошо иметь запасной план и быстро перестраиваться. То, что работало месяц назад, может перестать работать буквально за неделю.","Самая выгодная возможность может прийти не из текущего плана."],"general":["Один внешний фактор может сильно поменять ход недели.","Планы будут подвижными, поэтому жёсткая привязка к одному сценарию только добавит стресса.","Быстрая адаптация сейчас сильнее идеального плана."]},"The Hanged Man":{"love":["Связь может зависнуть: встреча переносится, человек не даёт ответа, отношения не переходят на следующий уровень.","Возможна ситуация ожидания, где ты уже устала, но всё ещё надеешься, что другой человек сам определится.","Карта советует не ждать бесконечно, а честно посмотреть, что ты реально получаешь от этой связи сейчас."],"money":["Проект может остановиться на согласовании, бюджете, клиенте или внутреннем решении.","Не стоит сразу вкладывать больше денег. Сначала проверь, не нужно ли изменить сам продукт, оффер или способ продвижения.","Иногда лучший шаг здесь — пауза на несколько дней и полный пересмотр логики проекта."],"general":["Что-то не пойдёт по плану и заставит остановиться.","Пауза нужна не для наказания, а чтобы увидеть ситуацию под другим углом.","Если процесс не двигается, не толкай его ещё сильнее тем же способом."]},"Death":{"love":["Может закончиться переписка, отношения или привычный формат общения. Иногда это резкий разрыв, иногда — просто окончательное понимание, что назад к прежнему уже не вернуться.","Если связь выживает, она всё равно должна сильно измениться: правила, границы, ожидания.","Не пытайся восстановить прежнюю форму только из страха потери."],"money":["Может закрыться проект, продукт, канал продаж или сотрудничество, которое давно тянет ресурс.","Это хорошая карта для жёсткой чистки: убрать убыточное, сократить лишнее, закрыть старую схему и освободить бюджет.","Если что-то не работает системно, не надо ещё раз «дать шанс» без изменения модели."],"general":["Один сюжет подходит к финалу. Это может ощущаться резко, но освобождает место для нового.","Главная ошибка — удерживать старое только потому, что в него уже много вложено.","Закрой то, что очевидно закончилось."]},"Temperance":{"love":["Вероятно спокойное сближение, примирение или восстановление контакта после напряжения.","Может проявиться мягкий, уравновешенный человек, без качелей и театра. Связь развивается медленнее, но устойчивее.","Если есть конфликт, разговор лучше проводить спокойно и без ультиматумов."],"money":["Главная задача — не запускать ещё десять новых идей, а настроить то, что уже есть.","Хорошо улучшать процессы, клиентский путь, качество, операционку, распределение нагрузки и расходы.","Может быть полезно соединить два подхода или два продукта в один более сильный вариант."],"general":["Период будет выравнивать крайности. После хаоса может появиться более спокойный ритм.","Результат приходит через настройку и баланс, а не через резкий рывок.","Не торопи то, что уже постепенно складывается."]},"The Devil":{"love":["Может возникнуть очень сильное сексуальное притяжение, но вместе с ним — ревность, зависимость, треугольник, тайная связь или игра властью.","Человек может быть харизматичным, обеспеченным, уверенным, но при этом контролирующим или эмоционально опасным.","Если после общения тебя больше тянет, чем успокаивает, внимательно смотри, не держится ли связь только на химии."],"money":["Возможны большие деньги, но с высокой ценой: тяжёлые условия, кредит, зависимость от одного клиента, токсичный партнёр, серые схемы.","Проверь долги, комиссии, проценты, скрытые обязательства и что будет, если ключевой клиент уйдёт.","Не соглашайся на выгодную цифру, пока не увидишь полную цену сделки."],"general":["Соблазн будет конкретным: деньги, секс, статус, контроль, быстрый результат.","Карта показывает не запрет, а зависимость. Важно понять, где ты перестаёшь выбирать свободно.","Если условие звучит слишком выгодно, проверь, чем за него придётся платить."]},"The Tower":{"love":["Возможен резкий разговор, всплывшая правда, конфликт, внезапный разрыв или событие, после которого делать вид, что всё нормально, уже не получится.","Если отношения держались на замалчивании, проблема выйдет наружу.","Не пытайся немедленно склеить всё обратно. Сначала пойми, что именно разрушилось — доверие, договорённость или сам формат."],"money":["Реально возможен провал по проекту: отмена сделки, потеря клиента, технический сбой, ошибка в расчётах, сорванный срок.","Первое действие — остановить потери. Второе — найти точку отказа. Только потом спасать проект.","Если система ломается от одного сбоя, проблема не в одном сотруднике, а в конструкции."],"general":["Что-то может сломать привычный сценарий довольно резко.","Карта не обязательно про катастрофу, а про слабое место, которое больше нельзя игнорировать.","Быстро отдели реальную проблему от паники и решай первое."]},"The Star":{"love":["Может появиться человек через интернет, соцсети, расстояние или общую мечту. Связь часто начинается красиво и вдохновляюще.","Человек может быть творческим, публичным, необычным по стилю или просто очень вдохновляющим.","Главная проверка — переходит ли красивое общение в реальные встречи и действия."],"money":["Сильны бренд, визуал, PR, соцсети, контент, публичность, креатив и долгосрочная стратегия.","Если проект буксует, возможно, ему не хватает не качества, а образа будущего — понятной идеи, зачем за ним следить и почему он отличается.","Хорошо работать над позиционированием и тем, как проект выглядит со стороны."],"general":["После сложного периода появится ориентир: идея, человек, предложение или понимание направления.","Не всё решится сразу, но станет понятнее, куда двигаться.","Полезно смотреть дальше ближайшей недели."]},"The Moon":{"love":["Может быть человек, который даёт смешанные сигналы: сегодня близко, завтра исчезает, говорит одно, делает другое.","Возможна скрытая связь, ревность, тайна, недоговорённость или просто ситуация, где один из вас сам не понимает своих чувств.","Не делай вывод по одному сообщению или одному эмоциональному разговору. Здесь особенно легко принять тревогу за интуицию."],"money":["Проверь цифры дважды. Возможны скрытые расходы, ошибки в отчётах, неверный прогноз, неполные данные или партнёр, который не говорит всей информации.","Не запускай большой бюджет, если не видишь прозрачной аналитики.","Сначала собери факты, потом принимай решение."],"general":["Период может быть эмоционально туманным. Сны, предчувствия и ощущения будут яркими, но факты могут отставать.","Будет легко накрутить себя или поверить в удобную версию.","Нужно второе подтверждение."]},"The Sun":{"love":["Очень вероятно яркое знакомство, признание, встреча, совместная поездка или момент, когда симпатия становится очевидной.","Может проявиться открытый, заметный, общительный человек, который не любит сложные игры и легко показывает интерес.","Если связь уже есть, хороший период для совместных планов, отдыха, темы детей или семейного события."],"money":["Хорошо показывать результат: кейс, цифры, презентацию, рекламу, выступление, запуск продукта.","Если есть сильный проект, его сейчас нужно вынести наружу. Прятать результат внутри команды — ошибка.","Хорошо просить повышение, предлагать себя, усиливать публичность и продажи."],"general":["Ситуация станет яснее и проще. Возможны хорошие новости, признание, успешное завершение или заметный результат.","То, что раньше было туманным, станет очевидным.","Используй момент, чтобы закрепить успех, а не просто порадоваться."]},"Judgement":{"love":["Может вернуться человек из прошлого, старая переписка или тема, которую вы не закрыли.","Но карта не обещает счастливое возвращение. Она проверяет, изменилось ли что-то реально или вы просто повторяете старый сценарий.","Если человек возвращается, смотри не на слова, а на то, что он делает иначе."],"money":["Хорошо возвращаться к старым лидам, клиентам, незакрытым переговорам, архивной базе.","Проект, который раньше не сработал, может получить второй шанс, если исправлена конкретная причина провала.","Проверь старые контакты — там может быть быстрее деньги, чем в новом холодном трафике."],"general":["Прошлая история напомнит о себе через человека, новость или решение.","Это не повтор ради повторения, а возможность закрыть вопрос иначе.","Смотри, какой урок ты раньше проигнорировала."]},"The World":{"love":["Может быть поездка, отношения на расстоянии, знакомство с человеком из другого города или страны.","Если отношения уже есть, возможен переход на новый уровень: совместная жизнь, переезд, серьёзное решение.","Карта показывает завершённость: либо связь становится полноценнее, либо становится окончательно ясно, что она закончена."],"money":["Очень сильны международные проекты, выход на новый рынок, масштабирование, завершение большого проекта, упаковка кейса.","Хорошо показывать итог клиентам, руководству, инвесторам, рынку.","Если проект давно тянется, сейчас важно не улучшать бесконечно, а официально закрыть этап и зафиксировать результат."],"general":["Большой цикл подходит к завершению. Может быть поездка, переезд, расширение, финал проекта или переход на следующий уровень.","Период даёт ощущение, что пазл наконец складывается.","Закрой старый этап полностью, чтобы не тащить хвосты дальше."]}};
+function focusedReading(c){
+ const signal=periodSignal(c);
+ const key=S.topic==="Отношения" ? "love" : (S.topic==="Деньги и работа" ? "money" : "general");
+ const arr=(CARD_DETAIL[c.en] && CARD_DETAIL[c.en][key]) || [c.event,c.advice,""];
+ const close = S.topic==="Отношения"
+   ? "Смотри не на красивое впечатление, а на последовательность действий человека: кто инициирует, предлагает конкретику и остаётся включённым после первых эмоций."
+   : S.topic==="Деньги и работа"
+   ? "Если в ближайшее время появится развилка между «ещё подумать» и сделать измеримый шаг, карта скорее толкает к действию, которое можно проверить цифрами."
+   : "Главный ориентир — не одно яркое событие, а тот сюжет, который повторится хотя бы дважды. Именно он покажет, где сейчас лежит ключевая тема периода.";
+ return `<div class="readingLead">${c.main}</div>
+   <p>${arr[0]}</p>
+   <p>${arr[1]}</p>
+   <p><span class="readingPunch">${signal}</span></p>
+   <p>${arr[2]} ${close}</p>`;
+}
+
+function renderReading(c){
+ arcanaNum.textContent=c.roman;
+ arcanaName.innerHTML=c.name.replaceAll(" ","<br>");
+ cardImage.onerror=null;
+ cardImage.parentElement.classList.remove("imageError");
+ cardImage.src=cardSvg(c);
+ cardImage.alt=c.name+" — карта Таро";
+ meta.textContent=S.period+" · "+S.topic;
+ const inline=document.getElementById("inlineReading");
+ if(inline) inline.innerHTML=focusedReading(c);
+}
+function block(label,big,text){return `<div class="section"><div class="cap">${label}</div><h3>${big}</h3><p>${text}</p></div>`}
+
+function renderDeck(){
+ deckOrder=[...ARCANA.keys()];
+ for(let i=deckOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deckOrder[i],deckOrder[j]]=[deckOrder[j],deckOrder[i]];}
+ const rows=[deckOrder.slice(0,11),deckOrder.slice(11)];
+ arcanaDeck.innerHTML=rows.map((row,rowIdx)=>{
+   const center=(row.length-1)/2;
+   const rowClass=rowIdx===0?'top':'bottom';
+   return `<div class="fanRow ${rowClass}">` + row.map((arcanaIdx,pos)=>{
+     const offset=pos-center;
+     const rot=(offset*3.2).toFixed(2);
+     const lift=(Math.abs(offset)*3.0 + (rowIdx===0?10:0)).toFixed(1);
+     return `<button class="pickCard" style="--rot:${rot}deg;--lift:${lift}px;z-index:${200-Math.abs(offset)*10}" type="button" aria-label="Выбрать закрытую карту" onclick="reveal(${arcanaIdx})"><span class="sigil"></span><span class="pickMark"></span></button>`;
+   }).join('') + `</div>`;
+ }).join('');
+}
+
+function reveal(idx){
+ flash.classList.remove('go');void flash.offsetWidth;flash.classList.add('go');
+ S.card=ARCANA[idx];
+ setTimeout(()=>{renderReading(S.card);go('reveal')},360)
+}
+
+/* NUMEROLOGY */
+let NUM_PERIOD='Сегодня';
+
+const NUMBERS={
+  1:{title:"ИНИЦИАТИВА",core:"Период самостоятельности, старта и личной воли.",strength:"Быстро принимать решения, начинать и брать ответственность на себя.",shadow:"Давить, торопить события и воспринимать помощь как слабость.",love:"В отношениях важно прямо говорить о своих желаниях, но не превращать контакт в борьбу за лидерство.",money:"Хорошо запускать новое, предлагать идеи, продавать и брать на себя заметную роль.",advice:"Выбери одно направление и сделай первый конкретный шаг.",avoid:"Не жди идеального момента и не пытайся контролировать реакцию всех вокруг."},
+  2:{title:"ПАРТНЁРСТВО",core:"Период чувствительности, взаимодействия и тонкой настройки.",strength:"Слышать людей, замечать нюансы и выстраивать контакт без давления.",shadow:"Зависеть от чужой реакции, тянуть с решением и копить невысказанное.",love:"На первый план выходят близость, диалог и взаимность. Важна не сила эмоций, а качество контакта.",money:"Лучше работают партнёрства, переговоры, рекомендации и аккуратная работа с отношениями.",advice:"Не форсируй события. Сначала собери обратную связь, потом принимай решение.",avoid:"Не соглашайся автоматически только ради того, чтобы избежать конфликта."},
+  3:{title:"ПРОЯВЛЕНИЕ",core:"Период общения, творчества, лёгкости и заметности.",strength:"Привлекать внимание, говорить, придумывать и создавать интерес вокруг идеи.",shadow:"Распыление, обещания без завершения и зависимость от вдохновения.",love:"Больше общения, флирта, знакомств и желания делиться эмоциями. Важно не скатиться в поверхностность.",money:"Полезны публичность, контент, продажи через общение, презентации и хорошая упаковка.",advice:"Покажи результат: напиши, опубликуй, предложи, презентуй.",avoid:"Не начинай пять дел одновременно, если ни одно не доводится до конца."},
+  4:{title:"СТРУКТУРА",core:"Период порядка, устойчивости, системы и практического результата.",strength:"Создавать фундамент, доводить дела до конца и превращать хаос в понятный процесс.",shadow:"Жёсткость, страх перемен и попытка удержать всё только правилами.",love:"В отношениях важны надёжность, договорённости и реальные действия вместо красивых обещаний.",money:"Хорошо считать, оптимизировать, выстраивать процессы, бюджет, документы и долгие проекты.",advice:"Наведи порядок там, где сейчас больше всего хаоса и потерь.",avoid:"Не путай стабильность с привычкой терпеть то, что давно не работает."},
+  5:{title:"ПЕРЕМЕНЫ",core:"Период движения, свободы, нового опыта и смены условий.",strength:"Быстро адаптироваться, пробовать новое и находить возможности там, где план изменился.",shadow:"Импульсивность, риск ради эмоций и отказ от обязательств из-за скуки.",love:"Может тянуть к новизне, сильным эмоциям, поездкам и необычным знакомствам. Особенно важны честность и границы.",money:"Подходят продажи, переговоры, поездки, тесты новых каналов и быстрые эксперименты.",advice:"Разреши себе изменить курс, но заранее определи предел риска.",avoid:"Не принимай серьёзное решение только потому, что стало скучно."},
+  6:{title:"ОТВЕТСТВЕННОСТЬ",core:"Период отношений, заботы, дома, красоты и зрелых обязательств.",strength:"Создавать устойчивость, поддерживать людей и переводить отношения в понятный формат.",shadow:"Спасательство, контроль под видом заботы и чрезмерное чувство долга.",love:"Личная сфера становится особенно важной: близость, семья, формат отношений и совместные решения.",money:"Хорошо идут сервис, красота, клиентский опыт, командная работа и продукты, где важны доверие и качество.",advice:"Поддерживай то, что взаимно и действительно имеет перспективу роста.",avoid:"Не бери на себя чужую ответственность ради сохранения красивой картинки."},
+  7:{title:"АНАЛИЗ",core:"Период глубины, наблюдения, знаний и внутренней настройки.",strength:"Разбираться в сложном, видеть скрытые связи и принимать решения после анализа.",shadow:"Закрываться, переанализировать и откладывать действие до полной определённости.",love:"Нужны пространство и честный разговор без давления. Попытка форсировать ситуацию даст обратный эффект.",money:"Сильны исследования, аналитика, обучение, стратегия и работа, где качество решения важнее скорости.",advice:"Собери факты и сформулируй один вывод, который действительно меняет твоё действие.",avoid:"Не используй анализ как способ никогда не выбирать."},
+  8:{title:"РЕЗУЛЬТАТ",core:"Период денег, влияния, управления и материальной отдачи.",strength:"Считать ресурсы, управлять процессом и доводить усилия до измеримого результата.",shadow:"Избыточный контроль, борьба за власть и оценка всего только через выгоду.",love:"Особенно заметен баланс вложений, власти и ответственности. Не игнорируй неравный обмен.",money:"Сильный акцент на доходе, переговорах, сделках, статусе, управлении и финансовой дисциплине.",advice:"Смотри на цифры. Усиль то, что даёт отдачу, и убери то, что забирает ресурс.",avoid:"Не принимай финансовые решения только из желания доказать силу или статус."},
+  9:{title:"ЗАВЕРШЕНИЕ",core:"Период итогов, освобождения, смысла и перехода в новый цикл.",strength:"Видеть общую картину, завершать старое и превращать опыт в зрелое решение.",shadow:"Держаться за прошлое, драматизировать финал или спасать то, что уже исчерпано.",love:"Старый сюжет может завершиться или изменить форму. Важнее честно увидеть итог, чем удерживать привычность.",money:"Полезно закрывать хвосты, завершать проекты, фиксировать результат и освобождать ресурсы.",advice:"Закрой одну историю чисто, чтобы новый цикл не начинался со старого долга.",avoid:"Не возвращайся в завершённый сценарий только из ностальгии."},
+  11:{title:"ИНТУИЦИЯ",core:"Период высокой чувствительности, идей и сильного внутреннего сигнала.",strength:"Тонко считывать настроение, вдохновлять и замечать то, что другие пропускают.",shadow:"Тревожность, нервное перенапряжение и доверие каждому сильному ощущению.",love:"Связи переживаются глубже обычного. Важно отличать реальный контакт от идеализации.",money:"Сильны идеи, коммуникация, творчество, консультирование и проекты, где важны видение и влияние.",advice:"Переведи сильную идею в один понятный и практический шаг.",avoid:"Не принимай эмоциональную интенсивность за доказательство правильности решения."},
+  22:{title:"МАСШТАБ",core:"Период больших задач, системности и долгосрочного строительства.",strength:"Соединять крупную идею с практической реализацией и собирать сложные проекты.",shadow:"Брать на себя слишком много, бояться масштаба или тонуть в контроле деталей.",love:"Нужны зрелость и совместимость реальных планов, а не только сильные чувства.",money:"Особенно сильны управление, системные проекты, бизнес, недвижимость и масштабирование.",advice:"Раздели большой замысел на этапы и зафиксируй ближайший измеримый результат.",avoid:"Не пытайся построить всё за один рывок."},
+  33:{title:"СЛУЖЕНИЕ",core:"Период влияния через знания, заботу и способность поддерживать других.",strength:"Объединять людей, обучать, поддерживать и создавать среду для роста.",shadow:"Самопожертвование, завышенная ответственность и попытка всех спасти.",love:"Отношения требуют равного обмена. Забота ценна только там, где она не уничтожает твои границы.",money:"Сильны обучение, наставничество, сервис, творчество и проекты с понятной пользой для людей.",advice:"Давай ценность, но сохраняй границы, цену и ответственность второй стороны.",avoid:"Не превращай помощь в обязанность жить чужую жизнь."}
+};
+
+function setNumPeriod(v,el){
+  NUM_PERIOD=v;
+  document.querySelectorAll('.numPeriodBtn').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+function digitSum(n){ return String(Math.abs(n)).split('').reduce((a,b)=>a+(+b||0),0); }
+function reduceNum(n,masters=true){
+  n=Math.abs(Number(n)||0);
+  while(n>9 && !(masters && [11,22,33].includes(n))) n=digitSum(n);
+  return n;
+}
+function reduceCycle(n){
+  n=Math.abs(Number(n)||0);
+  while(n>9) n=digitSum(n);
+  return n || 9;
+}
+function sumDateDigits(y,m,d){ return digitSum(y)+digitSum(m)+digitSum(d); }
+function fmtDate(dt){ return dt.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function shortDay(dt){ return dt.toLocaleDateString('ru-RU',{weekday:'short',day:'numeric'}).replace('.',''); }
+
+function calculateNumerology(){
+  const input=document.getElementById('numBirth');
+  const err=document.getElementById('numError');
+  err.textContent='';
+  if(!input.value){err.textContent='Введи дату рождения.';return;}
+  const [y,m,d]=input.value.split('-').map(Number);
+  const birth=new Date(y,m-1,d);
+  if(!y||!m||!d || birth.getFullYear()!==y || birth.getMonth()!==m-1 || birth.getDate()!==d){
+    err.textContent='Проверь дату рождения.';return;
+  }
+  const now=new Date();
+  if(birth>now){err.textContent='Дата рождения не может быть в будущем.';return;}
+
+  const life=reduceNum(sumDateDigits(y,m,d),true);
+  const birthday=reduceNum(d,true);
+  const attitude=reduceNum(d+m,true);
+  const py=reduceCycle(digitSum(d)+digitSum(m)+digitSum(now.getFullYear()));
+  const pm=reduceCycle(py+(now.getMonth()+1));
+  const pd=reduceCycle(pm+now.getDate());
+
+  let periodNumber=pd, periodTitle='ЛИЧНЫЙ ДЕНЬ', periodText=NUMBERS[pd];
+  let daysHTML='';
+  if(NUM_PERIOD==='7 дней'){
+    periodNumber=pd;
+    periodTitle='7 ДНЕЙ';
+    const arr=[];
+    for(let i=0;i<7;i++){
+      const dt=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
+      const yv=reduceCycle(digitSum(d)+digitSum(m)+digitSum(dt.getFullYear()));
+      const mv=reduceCycle(yv+(dt.getMonth()+1));
+      const dv=reduceCycle(mv+dt.getDate());
+      arr.push({dt,n:dv});
+    }
+    daysHTML=`<div class="section"><div class="cap">КАЛЕНДАРЬ 7 ДНЕЙ</div><h3>КАК МЕНЯЕТСЯ ЭНЕРГИЯ</h3>
+      <div class="numDays">${arr.map(x=>`<div class="numDay"><div class="d">${shortDay(x.dt)}</div><div class="n">${x.n}</div><div class="m">${NUMBERS[x.n].title}</div></div>`).join('')}</div>
+      <p class="numFormula">Первое число относится к сегодняшнему дню. Дальше смотри не на «хорошо» или «плохо», а на задачу каждого дня: начать, договориться, проявиться, навести порядок, изменить курс, взять ответственность, проанализировать, получить результат или завершить.</p></div>`;
+    periodText=NUMBERS[pd];
+  } else if(NUM_PERIOD==='Месяц'){
+    periodNumber=pm;
+    periodTitle='ЛИЧНЫЙ МЕСЯЦ';
+    periodText=NUMBERS[pm];
+  }
+
+  const lifeData=NUMBERS[life] || NUMBERS[reduceCycle(life)];
+  const birthData=NUMBERS[birthday] || NUMBERS[reduceCycle(birthday)];
+  const attitudeData=NUMBERS[attitude] || NUMBERS[reduceCycle(attitude)];
+  const yearData=NUMBERS[py];
+  const pData=periodText;
+
+  document.getElementById('numResultMeta').textContent=`${NUM_PERIOD.toUpperCase()} · ${fmtDate(now)}`;
+  document.getElementById('numHeroNumber').textContent=periodNumber;
+  document.getElementById('numHeroTitle').textContent=pData.title;
+  document.getElementById('numHeroText').textContent=pData.core;
+
+  document.getElementById('numGrid').innerHTML=`
+    <div class="numStat"><div class="k">Путь жизни</div><div class="v">${life}</div><div class="t">${lifeData.title}</div></div>
+    <div class="numStat"><div class="k">День рождения</div><div class="v">${birthday}</div><div class="t">${birthData.title}</div></div>
+    <div class="numStat"><div class="k">Личный год</div><div class="v">${py}</div><div class="t">${yearData.title}</div></div>`;
+
+  document.getElementById('numBlocks').innerHTML=
+    `<div class="section"><div class="cap">${periodTitle}</div><h3>${pData.core}</h3><p>${pData.advice}</p></div>`+
+    daysHTML+
+    `<div class="section"><div class="cap">ПУТЬ ЖИЗНИ · ${life}</div><h3>${lifeData.title}</h3><p>${lifeData.core} <span class="numAccent">Сильная сторона:</span> ${lifeData.strength}</p></div>`+
+    `<div class="section split"><div><div class="cap">В РЕСУРСЕ</div><h3>${lifeData.strength}</h3><p>Так твой базовый код проявляется в ресурсе.</p></div><div><div class="cap">В ТЕНИ</div><h3>${lifeData.shadow}</h3><p>Это не недостаток, а сценарий, который чаще включается при перегрузе, тревоге или попытке всё контролировать.</p></div></div>`+
+    `<div class="section"><div class="cap">ДЕНЬ РОЖДЕНИЯ · ${birthday}</div><h3>${birthData.title}</h3><p>${birthData.core} Это один из самых заметных способов твоего проявления: он часто включается раньше более глубоких жизненных сценариев.</p></div>`+
+    `<div class="section"><div class="cap">ЧИСЛО ВОСПРИЯТИЯ · ${attitude}</div><h3>${attitudeData.title}</h3><p>${attitudeData.core} Это число описывает, как ты входишь в новые ситуации, какое первое впечатление производишь и как обычно реагируешь на внешний мир.</p></div>`+
+    `<div class="section"><div class="cap">ЛИЧНЫЙ ГОД · ${py}</div><h3>${yearData.title}</h3><p>${yearData.core} ${yearData.advice}</p></div>`+
+    `<div class="section"><div class="cap">ОТНОШЕНИЯ</div><h3>КАК ПРОЯВЛЯЕТСЯ ПЕРИОД</h3><p>${pData.love}</p></div>`+
+    `<div class="section"><div class="cap">ДЕНЬГИ И РАБОТА</div><h3>ГДЕ ЛЕЖИТ ПРАКТИЧЕСКИЙ РЕЗУЛЬТАТ</h3><p>${pData.money}</p></div>`+
+    `<div class="section split"><div><div class="cap">ЧТО ДЕЛАТЬ</div><h3>${pData.advice}</h3><p>Не пытайся прожить число «правильно». Используй его как фокус: посмотри, какое решение уже требует твоего внимания.</p></div><div><div class="cap">ЧЕГО НЕ ДЕЛАТЬ</div><h3>${pData.avoid}</h3><p>Так чаще всего включается сложная сторона этого периода.</p></div></div>`+
+    `<div class="section finalbox"><div class="cap">ИТОГ ПЕРИОДА</div><h3>${pData.title}</h3><p>${pData.core} Главный ориентир — не ждать, что число «принесёт событие», а замечать, какие решения и повторяющиеся сюжеты сейчас выходят на первый план.</p></div>`+
+    `<div class="numFormula">Расчёт: пифагорейская нумерология по дате рождения. В базовом коде сохраняются мастер-числа 11, 22 и 33; циклы года, месяца и дня сведены к 1–9.</div>`;
+
+  go('numResult');
+}
+
+renderDeck(); preloadClassicCards();
+document.addEventListener('mousemove',e=>{let x=(e.clientX/window.innerWidth-.5)*7,y=(e.clientY/window.innerHeight-.5)*7;document.querySelectorAll('.miniCard,.numOrb').forEach(el=>el.style.translate=`${x}px ${y}px`)});
+</script></body></html>
